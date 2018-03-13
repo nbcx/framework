@@ -19,7 +19,7 @@
   ],
   "require": {
     "php": ">=5.6.0",
-    "nbcx/installer": "~1.0"
+    "nbcx/installer": "master"
   },
   "autoload": {
     "psr-4": { "nb\\": "./" }
