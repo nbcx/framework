@@ -35,6 +35,9 @@ NB提供了WEB开发中几乎所有的基础功能，且依旧保持轻量。你
 - 强大的命令行工具
 - Composer管理
 
+## 协议
+NB Framework的开源协议为apache 2.0，详情参见LICENSE。
+
 ## 其他
 - 官方QQ交流群：1985508
 - 项目官网主页：[https://nb.cx](https://nb.cx)
