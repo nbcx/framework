@@ -59,6 +59,12 @@ class Tcp extends Swoole {
         'managerStop'
     ];
 
+    public function __construct($options=[]) {
+        $this->options = array_merge($this->options,$options);
+        $register = get_class_methods($this->options['register']);
+        $register and $this->call = array_intersect($this->call,$register);
+    }
+
 
     public function run() {
         //设置server参数
@@ -73,7 +79,6 @@ class Tcp extends Swoole {
         foreach ($this->call as  $v) {
             $ser->on($v,[$callback,$v]);
         }
-
         //启动server
         $ser->start();
     }
@@ -83,8 +88,8 @@ class Tcp extends Swoole {
     }
 
     public function receive($server, $fd, $reactor_id, $data) {
-        $server->send($fd, "Swoole: {$data}");
-        $server->close($fd);
+        $server->send($fd, "service: {$data}");
+        //$server->close($fd);
     }
 
     public function close($server, $fd) {
