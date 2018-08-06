@@ -33,13 +33,14 @@ NB提供了WEB开发中几乎所有的基础功能，且依旧保持轻量。你
 - 内置协程 HTTP, TCP, WebSocket 网络服务器
 - 协程 Mysql, Redis 客户端
 - 强大的命令行工具
+- Composer管理
 
 ## 其他
 - 官方QQ交流群：1985508
 - 项目官网主页：[https://nb.cx](https://nb.cx)
 - 文档维护地址：[https://wiki.nb.cx](https://wiki.nb.cx) 
 
-来吧，欢迎各位进群一起写代码！
+欢迎各位烙铁进群一起写代码！
 
     
     
