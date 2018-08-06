@@ -1,6 +1,6 @@
 # NB Framework
 
-[![Latest Version](https://img.shields.io/badge/beta-v1.0.0-green.svg?maxAge=2592000)](https://github.com/nbcx/framework/releases)
+[![Latest Version](https://img.shields.io/badge/beta-v2.0.0-green.svg?maxAge=2592000)](https://github.com/nbcx/framework/releases)
 [![Php Version](https://img.shields.io/badge/php-%3E=7.0-brightgreen.svg?maxAge=2592000)](https://secure.php.net/)
 [![Swoole Version](https://img.shields.io/badge/swoole-%3E=2.1.3-brightgreen.svg?maxAge=2592000)](https://github.com/swoole/swoole-src)
 [![NB Wiki](https://img.shields.io/badge/docs-passing-green.svg?maxAge=2592000)](https://wiki.nb.cx)
