@@ -27,7 +27,7 @@ use nb\console\output\Output;
  * @property  string $name
  * @property  string $version 版本号
  */
-class Native extends Driver {
+class Base extends Driver {
 
     //private $name;
     //private $version;

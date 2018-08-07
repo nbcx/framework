@@ -127,4 +127,19 @@ abstract class Swoole extends Driver {
         }
     }
 
+    protected function error($e) {
+        //因为需要模拟die函数,所以此处需要catch处理
+        if($e->getMessage() === 'die') {
+            return;
+        }
+        throw new \ErrorException(
+            $e->getMessage(),
+            $e->getCode(),
+            1,
+            $e->getFile(),
+            $e->getLine(),
+            $e->getPrevious()
+        );
+    }
+
 }

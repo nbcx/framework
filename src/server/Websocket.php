@@ -9,6 +9,10 @@
  */
 namespace nb\server;
 
+use nb\Config;
+use nb\Debug;
+use nb\Dispatcher;
+use nb\Pool;
 use nb\server\assist\Swoole;
 
 /**
@@ -26,13 +30,13 @@ class Websocket extends Swoole {
         'driver'=>'websocket',
         'register'=>'',//注册一个类，来实现swoole自定义事件
         'host'=>'0.0.0.0',
-        'port'=>9502,
+        'port'=>9503,
         'max_request'=>'',//worker进程的最大任务数
         'worker_num'=>'',//设置启动的worker进程数。
         'dispatch_mode'=>2,//据包分发策略,默认为2
         'debug_mode'=>3,
         'enable_gzip'=>0,//是否启用压缩，0为不启用，1-9为压缩等级
-        'enable_log'=>'tmp'.DS.'swoole-http.log',
+        'enable_log'=>'tmp'.DS.'swoole-socket.log',
         'enable_pid'=>'/tmp/swoole.pid',
         'daemonize'=>true
     ];
@@ -61,6 +65,12 @@ class Websocket extends Swoole {
         'handShake'
     ];
 
+    public function __construct($options=[]) {
+        $this->options = array_merge($this->options,$options);
+        $register = get_class_methods($this->options['register']);
+        $register and $this->call = array_intersect($this->call,$register);
+    }
+
     public function run() {
         //设置server参数
         $ser = $this->server = new \swoole\websocket\Server($this->options['host'], $this->options['port']);
@@ -74,7 +84,7 @@ class Websocket extends Swoole {
         foreach ($this->call as  $v) {
             $ser->on($v,[$callback,$v]);
         }
-
+        Config::$o->sapi='websocket';
         //启动server
         $ser->start();
     }
@@ -85,9 +95,19 @@ class Websocket extends Swoole {
         });
     }
 
-    public function message(\swoole\Server $server, $frame) {
-        echo "received message: {$frame->data}\n";
-        $server->push($frame->fd, json_encode(["hello", "world"]));
+    public function message(\swoole\websocket\Server $server, \swoole\websocket\Frame $frame) {
+        try {
+            ob_start();
+            Pool::destroy();
+            Pool::value('\swoole\websocket\Frame', $frame);
+            Dispatcher::run();
+        }
+        catch (\Throwable $e) {
+            $this->error($e);
+        }
+        Debug::end();
+        $server->push($frame->fd,ob_get_contents());
+        ob_end_clean();
     }
 
     public function close(\swoole\Server $server, $fd) {

@@ -21,7 +21,7 @@ use nb\Pool;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/28
  */
-class Swoole extends Driver {
+class Http extends Driver {
 
     /**
      * @var \swoole\http\Request

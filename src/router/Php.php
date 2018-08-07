@@ -22,7 +22,7 @@ use nb\router\assist\Parser;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/29
  */
-class Native extends Driver {
+class Php extends Driver {
 
     /**
      * 当前路由名称

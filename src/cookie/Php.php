@@ -10,10 +10,9 @@
 namespace nb\cookie;
 
 use nb\Config;
-use nb\Pool;
 
 /**
- * Swoole
+ * Native
  *
  * @package nb\cookie
  * @link https://nb.cx
@@ -21,13 +20,9 @@ use nb\Pool;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/28
  */
-class Swoole extends Driver {
+class Php extends Driver {
 
     protected $config;
-
-    protected $request;
-
-    protected $response;
 
     /**
      * Cookie初始化
@@ -42,10 +37,6 @@ class Swoole extends Driver {
         if (!empty($this->config['httponly'])) {
             ini_set('session.cookie_httponly', 1);
         }
-        $this->request  = Pool::value('\swoole\http\Request');
-        $this->response = Pool::value('\swoole\http\Response');
-        //$this->request  = \nb\driver\Swoole::$o->request;
-        //$this->response = \nb\driver\Swoole::$o->response;
     }
 
     /**
@@ -70,6 +61,7 @@ class Swoole extends Driver {
      * @return mixed
      */
     public function set($name, $value = '', $option = null) {
+
         // 参数设置(会覆盖黙认设置)
         if (!is_null($option)) {
             if (is_numeric($option)) {
@@ -89,9 +81,11 @@ class Swoole extends Driver {
             array_walk_recursive($value, 'self::jsonFormatProtect', 'encode');
             $value = 'nb:' . json_encode($value);
         }
-        $expire = !empty($config['expire']) ? Request::ins()->requestTime + intval($config['expire']) : 0;
-        $this->response->cookie($name, $value, $expire, $config['path'], $config['domain'], $config['secure'], $config['httponly']);
-        $this->request->cookie[$name] = $value;
+        $expire = !empty($config['expire']) ? $_SERVER['REQUEST_TIME'] + intval($config['expire']) : 0;
+        if ($config['setcookie']) {
+            setcookie($name, $value, $expire, $config['path'], $config['domain'], $config['secure'], $config['httponly']);
+        }
+        $_COOKIE[$name] = $value;
     }
 
     /**
@@ -118,7 +112,7 @@ class Swoole extends Driver {
     public function has($name, $prefix = null) {
         $prefix = !is_null($prefix) ? $prefix : $this->config['prefix'];
         $name = $prefix . $name;
-        return isset($this->response->cookie[$name]);
+        return isset($_COOKIE[$name]);
     }
 
     /**
@@ -130,8 +124,8 @@ class Swoole extends Driver {
     public function get($name, $prefix = null) {
         $prefix = !is_null($prefix) ? $prefix : $this->config['prefix'];
         $name = $prefix . $name;
-        if (isset($this->request->cookie[$name])) {
-            $value = $this->request->cookie[$name];
+        if (isset($_COOKIE[$name])) {
+            $value = $_COOKIE[$name];
             if (0 === strpos($value, 'nb:')) {
                 $value = substr($value, 6);
                 $value = json_decode($value, true);
@@ -153,18 +147,10 @@ class Swoole extends Driver {
         $prefix = is_null($prefix) ? $config['prefix'] : $prefix;
         $name = $prefix . $name;
         if ($config['setcookie']) {
-            $this->response->cookie(
-                $name,
-                '',
-                Http::obj()->requestTime - 3600,
-                $config['path'],
-                $config['domain'],
-                $config['secure'],
-                $config['httponly']
-            );
+            setcookie($name, '', $_SERVER['REQUEST_TIME'] - 3600, $config['path'], $config['domain'], $config['secure'], $config['httponly']);
         }
         // 删除指定cookie
-        unset($this->response->cookie[$name]);
+        unset($_COOKIE[$name]);
     }
 
     /**
@@ -174,7 +160,7 @@ class Swoole extends Driver {
      */
     public function clear($prefix = '') {
         // 清除指定前缀的所有cookie
-        if (empty($this->request->cookie)) {
+        if (empty($_COOKIE)) {
             return;
         }
         // 要删除的cookie前缀，不指定则删除config设置的指定前缀
@@ -184,18 +170,15 @@ class Swoole extends Driver {
         foreach ($_COOKIE as $key => $val) {
             $key = $prefix.$key;
             if ($config['setcookie']) {
-                $this->response->cookie(
-                    $key,
-                    '',
-                    Http::obj()->requestTime - 3600,
-                    $config['path'],
-                    $config['domain'],
-                    $config['secure'],
-                    $config['httponly']
-                );
+                setcookie($key, '', $_SERVER['REQUEST_TIME'] - 3600, $config['path'], $config['domain'], $config['secure'], $config['httponly']);
             }
-            unset($this->request->cookie[$key]);
+            unset($_COOKIE[$key]);
         }
     }
 
+    private function jsonFormatProtect(&$val, $key, $type = 'encode') {
+        if (!empty($val) && true !== $val) {
+            $val = 'decode' == $type ? urldecode($val) : urlencode($val);
+        }
+    }
 }

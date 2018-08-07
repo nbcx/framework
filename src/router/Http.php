@@ -17,11 +17,10 @@ use nb\Request;
  *
  * @package nb\router
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/29
  */
-class Swoole extends Native {
+class Http extends Php {
 
     protected function _class() {
         $module = $this->module;

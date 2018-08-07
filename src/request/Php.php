@@ -18,7 +18,7 @@ namespace nb\request;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/28
  */
-class Native extends Driver {
+class Php extends Driver {
 
     // php://input
     public function __construct() {

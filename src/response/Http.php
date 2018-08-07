@@ -24,7 +24,7 @@ use nb\Server;
  *
  * @method  \swoole\http\Response end()
  */
-class Swoole extends Driver {
+class Http extends Driver {
 
     /**
      * @var \swoole\http\Response

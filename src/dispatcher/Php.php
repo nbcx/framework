@@ -10,21 +10,19 @@
 namespace nb\dispatcher;
 
 use nb\Config;
+use nb\Pool;
 use nb\Request;
 use nb\Router;
-use nb\Validate;
-use nb\Pool;
 
 /**
- * Driver
+ * Php
  *
- * @package nb\dispatcher
+ * @package nb\src\dispatcher
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/3
  */
-class Native extends Driver {
+class Php extends Driver {
 
     /**
      * 当前请求的参数(控制器指定了method或自动获取的)

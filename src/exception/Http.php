@@ -23,7 +23,7 @@ use nb\Pool;
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/7
  */
-class Swoole extends Native {
+class Http extends Php {
 
     /**
      * 当Swoole server关闭时

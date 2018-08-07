@@ -24,7 +24,7 @@ use nb\Router;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/29
  */
-class Native extends Driver {
+class Base extends Driver {
 
     // 模板变量
     protected $data = [];

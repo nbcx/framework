@@ -143,7 +143,7 @@ class Config extends Access {
     //运行方式
     //public $sapi;//                = php_sapi_name()=='cli'?'cli':'web';
     protected function _sapi() {
-        return php_sapi_name()=='cli'?'cli':'web';
+        return php_sapi_name()=='cli'?'command':'php';
     }
 
     //public $path                =  __APP__;

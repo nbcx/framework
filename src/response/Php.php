@@ -18,7 +18,7 @@ namespace nb\response;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/28
  */
-class Native extends Driver {
+class Php extends Driver {
 
     /**
      * 设置http头

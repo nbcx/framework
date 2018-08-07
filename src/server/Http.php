@@ -38,7 +38,7 @@ class Http extends Swoole {
         'driver'=>'tcp',
         'register'=>'nb\\event\\Swoole',//注册一个类，来实现swoole自定义事件
         'host'=>'0.0.0.0',
-        'port'=>9502,
+        'port'=>9501,
         'max_request'=>'',//worker进程的最大任务数
         'worker_num'=>'',//设置启动的worker进程数。
         'dispatch_mode'=>2,//据包分发策略,默认为2

@@ -13,7 +13,7 @@ namespace nb\exception;
 use nb\Config;
 
 /**
- * Native
+ * 处理php-fpm模式下的异常
  *
  * @package nb\exception
  * @link https://nb.cx
@@ -21,7 +21,7 @@ use nb\Config;
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/7
  */
-class Native extends Driver {
+class Php extends Driver {
 
     protected function show($e,$deadly = false) {
         if (Config::$o->debug && $deadly) {

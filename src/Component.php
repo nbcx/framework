@@ -14,7 +14,6 @@ namespace nb;
  *
  * @package nb
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2018/7/25
  */
@@ -50,14 +49,6 @@ abstract class Component {
         $class = self::parse($alias,$config);
 
         return Pool::object($alias,$class,$args);
-        /*
-        $reflection = new \ReflectionClass($class);
-
-        return Pool::set($alias,call_user_func_array(
-            [&$reflection, 'newInstance'],
-            $args
-        ));
-        */
     }
 
     /**
@@ -69,33 +60,36 @@ abstract class Component {
     protected static function parse($class,$config) {
         $class = strtolower($class);
         if(isset($config['driver']) && $config['driver']) {
-
             if(strpos('/',$config['driver'])) {
                 $class = $config['driver'];
             }
             else {
                 //如果无'/'，表明驱动为内置类
-                $class .= '\\'.ucfirst($config['driver']);
+                $class .= '\\' . ucfirst($config['driver']);
             }
+            return $class;
+        }
+        $driver = $class . '\\' . ucfirst(Config::$o->sapi);
+
+        if(class_exists($driver)) {
+            $class = $driver;
         }
         else {
-            switch (Config::$o->sapi) {
-                case 'swoole':
-                    $class .= class_exists($class . '\\Swoole')?'\\Swoole':'\\Native';
-                    break;
-                case 'cli':
-                    $class .= class_exists($class . '\\Command')?'\\Command':'\\Native';
-                    break;
-                default :
-                    $class .= '\\Native';
-                    break;
-            }
+            $class .= '\\Base';
         }
         return $class;
     }
 
+    /**
+     * 根据组件类名获取框架配置里的设置
+     * @return mixed|null
+     */
     public static function config() {
-        get_called_class();
+        $key = explode('\\',get_called_class());
+        $key = strtolower(end($key));
+        if(isset(Config::$o->$key)) {
+            return Config::$o->$key;
+        }
         return null;
     }
 

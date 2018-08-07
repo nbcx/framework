@@ -20,7 +20,7 @@ use nb\Config;
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/3
  */
-class Native extends Driver {
+class Base extends Driver {
 
     protected $options = [
         'expire' => 0,
