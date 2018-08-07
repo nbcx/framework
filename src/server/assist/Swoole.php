@@ -24,6 +24,8 @@ use nb\server\Driver;
  */
 abstract class Swoole extends Driver {
 
+    protected $server;
+
     abstract function run();
 
     public function start($daemonize=true) {
@@ -140,6 +142,16 @@ abstract class Swoole extends Driver {
             $e->getLine(),
             $e->getPrevious()
         );
+    }
+
+    public function __call($name, $arguments) {
+        // TODO: Implement __call() method.
+        return call_user_func_array([$this->server,$name],$arguments);
+    }
+
+    public function __get($name) {
+        // TODO: Implement __get() method.
+        return $this->server->$name;
     }
 
 }

@@ -62,7 +62,8 @@ class Websocket extends Swoole {
         'managerStop',
         'message',
         'open',
-        'handShake'
+        'handShake',
+        'request'
     ];
 
     public function __construct($options=[]) {
@@ -73,33 +74,28 @@ class Websocket extends Swoole {
 
     public function run() {
         //设置server参数
-        $ser = $this->server = new \swoole\websocket\Server($this->options['host'], $this->options['port']);
-        $ser->set($this->options);
+        $this->server = new \swoole\websocket\Server($this->options['host'], $this->options['port']);
+        $this->server->set($this->options);
 
         //设置server回调事件
-        $ser->on('open',[$this,'open']);
-        $ser->on('message',[$this,'message']);
-        $ser->on('close',[$this,'close']);
+        //$ser->on('open',[$this,'open']);
+        $this->server->on('message',[$this,'message']);
+        //$ser->on('close',[$this,'close']);
+        $this->server->on('request',[$this,'request']);
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
-            $ser->on($v,[$callback,$v]);
+            $this->server->on($v,[$callback,$v]);
         }
         Config::$o->sapi='websocket';
         //启动server
-        $ser->start();
-    }
-
-    public function open(\swoole\Server $server, $req) {
-        $server->on('open', function($server, $req) {
-            echo "connection open: {$req->fd}\n";
-        });
+        $this->server->start();
     }
 
     public function message(\swoole\websocket\Server $server, \swoole\websocket\Frame $frame) {
         try {
             ob_start();
             Pool::destroy();
-            Pool::value('\swoole\websocket\Frame', $frame);
+            Pool::set('\swoole\websocket\Frame', $frame);
             Dispatcher::run();
         }
         catch (\Throwable $e) {
@@ -109,6 +105,26 @@ class Websocket extends Swoole {
         $server->push($frame->fd,ob_get_contents());
         ob_end_clean();
     }
+
+    public function request_bak($request, $response) {
+        $server = $this->server;
+        //e($server);
+        foreach ($server->connections as $fd) {
+            echo $fd."\n";
+            //$request->get['message']
+            $server->push($fd, 'hello');
+        }
+        echo 'request end'."\n";
+        $response->end('pushed');
+    }
+
+    public function open(\swoole\Server $server, $req) {
+        $server->on('open', function($server, $req) {
+            echo "connection open: {$req->fd}\n";
+        });
+    }
+
+
 
     public function close(\swoole\Server $server, $fd) {
         echo "connection close: {$fd}\n";

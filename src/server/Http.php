@@ -93,31 +93,21 @@ class Http extends Swoole {
         foreach ($this->call as  $v) {
             $ser->on($v,[$callback,$v]);
         }
-        Config::$o->sapi='swoole';
+
         $ser->start();
     }
 
     public function request(\swoole\http\Request $request, \swoole\http\Response $response) {
         try {
+            Config::$o->sapi='http';
             ob_start();
             Pool::destroy();
-            Pool::value('\swoole\http\Request', $request);
-            Pool::value('\swoole\http\Response',$response);
+            Pool::set('\swoole\http\Request', $request);
+            Pool::set('\swoole\http\Response',$response);
             Dispatcher::run();
         }
         catch (\Throwable $e) {
-            //因为需要模拟die函数,所以此处需要catch处理
-            if($e->getMessage() !== 'die') {
-                throw new \ErrorException(
-                    $e->getMessage(),
-                    $e->getCode(),
-                    1,
-                    $e->getFile(),
-                    $e->getLine(),
-                    $e->getPrevious()
-                );
-
-            }
+            $this->error($e);
         }
         Debug::end();
         $response->end(ob_get_contents());

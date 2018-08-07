@@ -59,6 +59,7 @@ class Server extends Component implements Command {
             $daemonize = false;
         }
         $driver = self::driver();
+        Pool::solidify(self::class);//server对象不应被销毁
         switch ($command) {
             case 'start':
                 $driver->start($daemonize);

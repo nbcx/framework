@@ -14,7 +14,6 @@ use nb\Request;
 use nb\Response;
 use nb\Router;
 use nb\Pool;
-use nb\src\dispatcher\Php;
 
 /**
  * Swoole
