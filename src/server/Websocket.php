@@ -24,7 +24,7 @@ use nb\server\assist\Swoole;
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/1
  */
-class Websocket extends Swoole {
+class Websocket extends Http {
 
     protected $options = [
         'driver'=>'websocket',
@@ -36,9 +36,10 @@ class Websocket extends Swoole {
         'dispatch_mode'=>2,//据包分发策略,默认为2
         'debug_mode'=>3,
         'enable_gzip'=>0,//是否启用压缩，0为不启用，1-9为压缩等级
-        'enable_log'=>'tmp'.DS.'swoole-socket.log',
+        'enable_log'=>__APP__.'tmp'.DS.'swoole-socket.log',
         'enable_pid'=>'/tmp/swoole.pid',
-        'daemonize'=>true
+        'daemonize'=>true,
+        'request'=>false,//启用内置的onRequest回调
     ];
 
     protected $call = [
@@ -66,37 +67,30 @@ class Websocket extends Swoole {
         'request'
     ];
 
-    public function __construct($options=[]) {
-        $this->options = array_merge($this->options,$options);
-        $register = get_class_methods($this->options['register']);
-        $register and $this->call = array_intersect($this->call,$register);
-    }
-
     public function run() {
         //设置server参数
-        $this->server = new \swoole\websocket\Server($this->options['host'], $this->options['port']);
-        $this->server->set($this->options);
+        $server = new \swoole\websocket\Server($this->options['host'], $this->options['port']);
+        $server->set($this->options);
 
         //设置server回调事件
-        //$ser->on('open',[$this,'open']);
-        $this->server->on('message',[$this,'message']);
-        //$ser->on('close',[$this,'close']);
-        $this->server->on('request',[$this,'request']);
+        $server->on('message',[$this,'message']);
+        $this->options['request'] and $server->on('request',[$this,'request']);
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
-            $this->server->on($v,[$callback,$v]);
+            $server->on($v,[$callback,$v]);
         }
-        Config::$o->sapi='websocket';
+        $this->swoole = $server;
         //启动server
-        $this->server->start();
+        $this->swoole->start();
     }
 
     public function message(\swoole\websocket\Server $server, \swoole\websocket\Frame $frame) {
         try {
+            Config::$o->sapi='websocket';
             ob_start();
             Pool::destroy();
             Pool::set('\swoole\websocket\Frame', $frame);
-            Dispatcher::run();
+            Dispatcher::run($frame->data);
         }
         catch (\Throwable $e) {
             $this->error($e);
@@ -106,28 +100,11 @@ class Websocket extends Swoole {
         ob_end_clean();
     }
 
-    public function request_bak($request, $response) {
-        $server = $this->server;
-        //e($server);
-        foreach ($server->connections as $fd) {
-            echo $fd."\n";
-            //$request->get['message']
-            $server->push($fd, 'hello');
-        }
-        echo 'request end'."\n";
-        $response->end('pushed');
-    }
-
-    public function open(\swoole\Server $server, $req) {
-        $server->on('open', function($server, $req) {
-            echo "connection open: {$req->fd}\n";
-        });
-    }
-
-
-
-    public function close(\swoole\Server $server, $fd) {
-        echo "connection close: {$fd}\n";
+    /**
+     * @return \swoole\websocket\Frame
+     */
+    public function frame() {
+        return Pool::get('\swoole\websocket\Frame');
     }
 
 }

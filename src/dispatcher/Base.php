@@ -8,8 +8,8 @@
  * file that was distributed with this source code.
  */
 namespace nb\dispatcher;
+
 use nb\Config;
-use nb\dispatcher\Driver;
 use nb\Pool;
 use nb\Router;
 
@@ -21,17 +21,17 @@ use nb\Router;
  * @author: collin <collin@nb.cx>
  * @date: 2018/8/7
  */
-class Websocket extends Driver {
+class Base extends Driver {
 
     //请求控制器方法的参数
     protected $params = [];
 
-    public function run(){
-        $frame = Pool::get('\swoole\websocket\Frame');
-        $data = json_decode($frame->data,true);
-        is_null($data) and trigger_error('The data must be a JSON string');
-        $action = isset($data['action'])?$data['action']:'';
-        unset($data['action']);
+    public function run($data=null){
+        //$frame = Pool::get('\swoole\websocket\Frame');
+        //$data = $frame->data;
+
+        $action = Pool::object('\event\Framework')->parser($data);
+
         $this->params = $data;
         $this->with($action);
     }

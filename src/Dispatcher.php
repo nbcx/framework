@@ -37,9 +37,9 @@ class Dispatcher extends Component {
     /**
      * 请求到来，开始调度了
      */
-    public static function run() {
+    public static function run($data=null) {
         Debug::start();
-        self::driver()->run();
+        self::driver()->run($data);
     }
 
     /**

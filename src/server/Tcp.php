@@ -33,7 +33,7 @@ class Tcp extends Swoole {
         'dispatch_mode'=>2,//据包分发策略,默认为2
         'debug_mode'=>3,
         'enable_gzip'=>0,//是否启用压缩，0为不启用，1-9为压缩等级
-        'enable_log'=>'tmp'.DS.'swoole-tcp.log',
+        'enable_log'=>__APP__.'tmp'.DS.'swoole-tcp.log',
         'enable_pid'=>'/tmp/swoole.pid',
         'daemonize'=>true
     ];
@@ -59,41 +59,37 @@ class Tcp extends Swoole {
         'managerStop'
     ];
 
-    public function __construct($options=[]) {
-        $this->options = array_merge($this->options,$options);
-        $register = get_class_methods($this->options['register']);
-        $register and $this->call = array_intersect($this->call,$register);
-    }
-
-
     public function run() {
         //设置server参数
-        $ser = $this->server = new \swoole\Server($this->options['host'], $this->options['port']);
-        $ser->set($this->options);
+        $server = new \swoole\Server($this->options['host'], $this->options['port']);
+        $server->set($this->options);
 
         //设置server回调事件
-        $ser->on('connect',[$this,'connect']);
-        $ser->on('receive',[$this,'receive']);
-        $ser->on('close',  [$this,'close']);
+        $server->on('receive',[$this,'receive']);
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
-            $ser->on($v,[$callback,$v]);
+            $server->on($v,[$callback,$v]);
         }
+        $this->swoole = $server;
         //启动server
-        $ser->start();
+        $server->start();
     }
 
-    public function connect($server, $fd) {
-        echo "connection open: {$fd}\n";
-    }
 
     public function receive($server, $fd, $reactor_id, $data) {
-        $server->send($fd, "service: {$data}");
-        //$server->close($fd);
+        try {
+            Config::$o->sapi='tcp';
+            ob_start();
+            Pool::destroy();
+            Dispatcher::run($data);
+        }
+        catch (\Throwable $e) {
+            $this->error($e);
+        }
+        Debug::end();
+        $server->push($fd,ob_get_contents());
+        ob_end_clean();
     }
 
-    public function close($server, $fd) {
-        echo "connection close: {$fd}\n";
-    }
 
 }

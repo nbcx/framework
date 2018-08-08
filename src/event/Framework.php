@@ -184,4 +184,17 @@ class Framework {
         return true;
     }
 
+    /**
+     * 解析websocket,tcp的路由
+     * @param $data 客服端发送数据
+     * @return string
+     */
+    public function parser(&$data) {
+        $data = json_decode($data,true);
+        is_null($data) and trigger_error('The data must be a JSON string');
+        $action = isset($data['action'])?$data['action']:'';
+        unset($data['action']);
+        return $action;
+    }
+
 }

@@ -29,7 +29,14 @@ abstract class Component {
     }
 
     /**
-     * 获取驱动对象
+     * 创建并返回一个驱动对象
+     */
+    public static function create() {
+
+    }
+
+    /**
+     * 获取驱动对象，以单列的模式保存在对象池里
      * @return mixed|null
      */
     public static function driver(){

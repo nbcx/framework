@@ -12,19 +12,23 @@ namespace  nb\server\assist;
 use nb\Config;
 use nb\Console;
 use nb\server\Driver;
-
 /**
  * Swoole
  *
  * @package nb\server
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/28
  */
 abstract class Swoole extends Driver {
 
-    protected $server;
+    protected $swoole;
+
+    public function __construct($options=[]) {
+        $this->options = array_merge($this->options,$options);
+        $register = get_class_methods($this->options['register']);
+        $register and $this->call = array_intersect($this->call,$register);
+    }
 
     abstract function run();
 
@@ -146,12 +150,12 @@ abstract class Swoole extends Driver {
 
     public function __call($name, $arguments) {
         // TODO: Implement __call() method.
-        return call_user_func_array([$this->server,$name],$arguments);
+        return call_user_func_array([$this->swoole,$name],$arguments);
     }
 
     public function __get($name) {
         // TODO: Implement __get() method.
-        return $this->server->$name;
+        return $this->swoole->$name;
     }
 
 }

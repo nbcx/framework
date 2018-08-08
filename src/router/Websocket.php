@@ -71,37 +71,64 @@ class Websocket extends Driver {
         return $this;
     }
 
-
-    /**
-     * 路由反解析函数
-     *
-     * @param string $name 路由配置表名称
-     * @param array $value 路由填充值
-     * @param string $prefix 最终合成路径的前缀
-     * @return string
-     */
-    //public function url($name, array $value = NULL, $prefix = NULL) {
-    //    return null;
-    //}
-
-    /**
-     * 手动填写url解析路径
-     *
-     * 暂时不用
-     *
-     * @access public
-     * @param string $pathInfo 全路径
-     * @param mixed $parameter 输入参数
-     * @return mixed
-     * @throws Exception
-     */
-    //public function match($pathInfo, $parameter = NULL) {
-    //    return null;
-        //在CLI模式下，不需要url
-    //}
-
     protected function _folder_default(){
-        return Config::$o->folder_console;
+        return Config::$o->folder_controller;
+    }
+
+    protected function _class() {
+        $module = $this->module;
+        $zone = '';
+        if($module) {
+            $zone = Config::$o->folder_module.'\\'.$module.'\\';
+        }
+        if($this->folder) {
+            //path:app/folder/controller/Class
+            //path:app/controller/folder/Class
+            //url:app/folder/Class
+            $class =  "{$zone}controller\\{$this->folder}\\{$this->controller}";
+        }
+        else {
+            //path:app/controller/Class
+            //url:app/Class
+            $class =  "{$zone}controller\\{$this->controller}";
+        }
+        if(class_exists($class)) {
+            return $class;
+        }
+        return $this->load()?$class:false;
+    }
+
+    protected function load() {
+        $conf = Config::$o;
+        $folder_controller = $this->folder_default;
+        $path = __APP__;
+        if($this->module) {
+            $path .= $conf->folder_module.'/'.$this->module.'/';
+        }
+        else {
+            $path .=($conf->folder_app?$conf->folder_app.'/':'');
+        }
+        if($this->folder) {
+            //folder\filename
+            $tmp = $path .$this->folder.'/';
+            if (!is_dir($tmp) && $folder_controller) {
+                //controller\folder\filename
+                $tmp = $path.$folder_controller.'/'.$this->folder.'/';
+            }
+            $path  = $tmp;
+        }
+        else {
+            $path  .= $folder_controller.'/';
+        }
+        $file = $path.$this->controller.'.php';
+        $auto = glob($path.'*.php');
+        foreach ($auto as $v) {
+            if (strcasecmp($v, $file) == 0) {
+                include_once $v;
+                return true;
+            }
+        }
+        return false;
     }
 
 }

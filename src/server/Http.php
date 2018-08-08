@@ -26,13 +26,6 @@ use nb\server\assist\Swoole;
  */
 class Http extends Swoole {
 
-    /**
-     * @var \swoole\http\Server
-     */
-    public $server;
-
-    public $workid;//当前work进程的id
-
     //必须的默认的配置
     protected $options = [
         'driver'=>'tcp',
@@ -70,31 +63,26 @@ class Http extends Swoole {
         'managerStop'
     ];
 
-    public function __construct($options=[]) {
-        $this->options = array_merge($this->options,$options);
-        $register = get_class_methods($this->options['register']);
-        $register and $this->call = array_intersect($this->call,$register);
-    }
-
     /**
      * 启动Swoole服务
      */
     public function run() {
         //设置server参数
-        $ser = $this->server = new \swoole\http\Server(
+        $server =  new \swoole\http\Server(
             $this->options['host'],
             $this->options['port']
         );
-        $ser->set($this->options);
+        $server->set($this->options);
 
         //设置server回调事件
-        $ser->on('request',    [$this,'request']);
+        $server->on('request',    [$this,'request']);
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
-            $ser->on($v,[$callback,$v]);
+            $server->on($v,[$callback,$v]);
         }
 
-        $ser->start();
+        $this->swoole = $server;
+        $server->start();
     }
 
     public function request(\swoole\http\Request $request, \swoole\http\Response $response) {
