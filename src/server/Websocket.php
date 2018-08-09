@@ -103,7 +103,7 @@ class Websocket extends Http {
     /**
      * @return \swoole\websocket\Frame
      */
-    public function frame() {
+    public function _frame()     {
         return Pool::get('\swoole\websocket\Frame');
     }
 
