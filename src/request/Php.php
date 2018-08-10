@@ -169,7 +169,7 @@ class Php extends Driver {
      * @return string
      */
     public function _scheme() {
-        return $this->isSsl() ? 'https' : 'http';
+        return $this->isSsl ? 'https' : 'http';
     }
 
     /**
@@ -178,7 +178,6 @@ class Php extends Driver {
      * @return bool
      */
     public function _isSsl() {
-        $this->isSsl = true;
         $server = $_SERVER;
         if (isset($server['HTTPS']) && ('1' == $server['HTTPS'] || 'on' == strtolower($server['HTTPS']))) {
             return true;
@@ -192,7 +191,6 @@ class Php extends Driver {
         elseif (isset($server['HTTP_X_FORWARDED_PROTO']) && 'https' == $server['HTTP_X_FORWARDED_PROTO']) {
             return true;
         }
-        $this->isSsl = false;
         return false;
     }
 
@@ -205,6 +203,7 @@ class Php extends Driver {
     public function _url() {
         return $this->url = $this->domain . $this->uri;
     }
+
     /**
      * 获取当前请求url，不含"？"及参数
      *

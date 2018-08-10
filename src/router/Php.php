@@ -75,7 +75,7 @@ class Php extends Driver {
                 }
                 else {
                     $module = Config::$o->module_register;
-                    if(in_array($url[1],$module)) {
+                    if(is_array($module) && in_array($url[1],$module)) {
                         $this->module = $url[1];
                     }
                     else {

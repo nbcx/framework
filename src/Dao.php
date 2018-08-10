@@ -61,7 +61,8 @@ class Dao extends Component {
             return $driver;
         }
         if($table===null) {
-            $table = end(explode('\\',$class));
+            $class = explode('\\',$class);
+            $table = end($class);
         }
         $config  = static::config();
 

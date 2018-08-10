@@ -216,6 +216,10 @@ class Validate extends Access {
         return new self($rules, $message, $field);
     }
 
+    public static function instance(array $rules = [], array $message = [], array $field = []) {
+        return new self($rules, $message, $field);
+    }
+
     /**
      * 添加字段验证规则
      * @access protected
