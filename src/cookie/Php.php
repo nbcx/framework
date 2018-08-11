@@ -22,7 +22,16 @@ use nb\Config;
  */
 class Php extends Driver {
 
-    protected $config;
+    public $config = [
+        'driver'=>'',
+        'prefix'    => '',// cookie 名称前缀
+        'expire'    => 0,// cookie 保存时间
+        'path'      => '/',// cookie 保存路径
+        'domain'    => '',// cookie 有效域名
+        'secure'    => false,//  cookie 启用安全传输
+        'httponly'  => '',// httponly设置
+        'setcookie' => true,// 是否使用 setcookie
+    ];
 
     /**
      * Cookie初始化
@@ -30,10 +39,8 @@ class Php extends Driver {
      * @return void
      */
     public function __construct(array $config = []) {
-        $this->config = $config;
-        if (empty($this->config)) {
-            $this->config = Config::getx('cookie');
-        }
+        $config and $this->config = array_merge($this->config,$config);
+
         if (!empty($this->config['httponly'])) {
             ini_set('session.cookie_httponly', 1);
         }
