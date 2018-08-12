@@ -21,7 +21,7 @@ namespace nb;
  * @property  boolean debug 默认关闭调试
  * @property  string path
  * @property  string register 注入一个类，来自定义框架里的一些事件，如报错处理
- * @property  string folder_application 默认模块文件夹名字
+ * @property  string folder_app 默认模块文件夹名字
  * @property  string folder_moudle 模块文件夹名字
  * @property  string folder_controller 默认控制器文件夹名字
  * @property  string folder_console 默认console控制器文件夹名字
