@@ -23,7 +23,7 @@ use PDO;
  * @author: collin <collin@nb.cx>
  * @date: 2017/3/30
  *
- * @method static \nb\dao\Mysql fe($distinct = false)
+ * @method static \nb\dao\Driver test($distinct = false)
  *
  * @method \nb\dao\Driver field($fieldName)
  * @method \nb\dao\Driver where($condition, $params = NULL)
@@ -50,7 +50,7 @@ class Dao extends Component {
 
     /**
      * 获取驱动对象
-     * @return mixed|null
+     * @return \nb\dao\Driver
      */
     public static function driver($table=null,$pk='id',$server = 'dao'){
         $class = get_called_class();
@@ -101,28 +101,6 @@ class Dao extends Component {
         ]);
     }
 
-
-	/**
-	 * 设置表名
-	 * @param $tableName
-     * @return Dao
-	 */
-	/*
-	public function table($tableName) {
-		if (strchr($tableName, ' ')) {
-			$tmp = explode(' ', str_replace(' as ', ' ', $tableName));
-			$tableName = $tmp[0];
-			$tableAlias = $tmp[1];
-		}
-		else {
-			$tableAlias = $tableName;
-		}
-		$this->driver->table($tableName);
-		$this->driver->alias($tableAlias);
-        return $this;
-	}
-	*/
-
 	/**
 	 * 设置表别名
 	 * @param $tableAlias
@@ -142,14 +120,6 @@ class Dao extends Component {
         return $this;
     }
 
-
-    /**
-     * @param $fieldName
-     * @return dao\Driver
-     */
-	//public function field($fieldName) {
-	//    return $this->driver->field($fieldName);
-    //}
 	
     /**
      * 向数据库添加一条数据
@@ -518,4 +488,20 @@ class Dao extends Component {
     //    }
     //    return null;
     //}
+
+    /**
+     * 对类库里的方法静态调用
+     * @param $name
+     * @param $arguments
+     * @return self
+     */
+    public static function __callStatic($method, $arguments) {
+
+        // TODO: Implement __callStatic() method.
+        $that = static::driver();
+        if (method_exists($that, $method)) {
+            return call_user_func_array([$that,$method],$arguments);
+        }
+        return null;
+    }
 }
