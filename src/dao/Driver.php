@@ -200,14 +200,9 @@ abstract class Driver extends Access {
      * @param $fieldName
      * @return Driver
      */
-    function field($fieldName) {
+    public function field($fieldName) {
         if ($this->fields && $this->fields != '*') {
-            if($fieldName != '*') {
-                $this->fields = $fieldName . ",$this->fields";
-            }
-            else {
-                $this->fields .= ',' . $fieldName;
-            }
+            $fieldName != '*' and $this->fields = $fieldName . ",$this->fields";
         }
         else {
             $this->fields = $fieldName;
@@ -686,6 +681,7 @@ abstract class Driver extends Access {
             if (!empty($this->having)) $groupby .= ' ' . $this->having;
         }
         $order = !empty($this->order) ? "ORDER BY $this->order" : '';
+
         $this->fields = $this->fields?$this->fields:'*';
         $sql = "SELECT $distinct $this->fields FROM `$this->table` $this->alias $this->join $this->where $groupby $order $this->limit";
         $sql = str_replace('table.',$this->alias.'.',$sql);

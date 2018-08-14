@@ -51,9 +51,9 @@ class Mysql extends Driver {
                 else if ($fieldName != '*') {
                     $this->fields = $fieldName . ",$this->fields";
                 }
-                else {
-                    $this->fields .= ',' . $fieldName;
-                }
+                //else {
+                //    $this->fields .= ',' . $fieldName;
+                //}
             }
             else {
                 $this->fields = $fieldName;

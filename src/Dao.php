@@ -26,7 +26,9 @@ use PDO;
  * @method static \nb\dao\Driver test($distinct = false)
  *
  * @method \nb\dao\Driver field($fieldName)
+ * @method \nb\dao\Driver left($table, $on = '', $server=null, $fields = '')
  * @method \nb\dao\Driver where($condition, $params = NULL)
+ * @method \nb\dao\Driver orderby($order)
  *
  * @property  PDO db
  */
@@ -36,7 +38,7 @@ class Dao extends Component {
 	 * Driver对象
 	 * @var \nb\dao\Driver
 	 */
-	public $driver = null;
+	public $driver;
 
     public static function config($name = 'dao') {
         // TODO: Implement config() method.
@@ -156,16 +158,6 @@ class Dao extends Component {
 	 * @param array $arr
 	 */
 	public function updateId($id, $data, $params=[], $filter=false) {
-	    /*
-	    if($params && !is_array($params) && is_array($data)) {
-            $filter = $params;
-            $params = [];
-            $data = array_filter($data,$filter);
-        }
-        if($this->validate && !$this->_validate($data)) {
-            return false;
-        }
-	    */
 		return $this->driver->where("{$this->driver->id}=?", [$id])->update($data,$params);
 	}
 
@@ -175,14 +167,6 @@ class Dao extends Component {
 	 * @param array $arr
 	 */
 	public function update($arr, $condition=null, $params=[], $filter=false) {
-	    /*
-        if($filter && is_array($arr)) {
-            $arr = array_filter($arr);
-            if($this->validate && !$this->_validate($arr)) {
-                return false;
-            }
-        }
-	    */
 		if($condition) {
 			$this->driver->where($condition, $params);
 		}
@@ -360,10 +344,8 @@ class Dao extends Component {
         $driver = $this->driver;
 
         is_array($condition) and $driver->where($condition[0],$condition[1]);
-
-        $driver->limit($rows,$start)
-            ->orderby($order)
-            ->field($fields);
+        $order and $driver->orderby($order);
+        $driver->limit($rows,$start)->field($fields);
         return $driver->fetchPage($fetchMode);
     }
 
