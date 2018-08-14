@@ -376,6 +376,27 @@ class Dao extends Component {
         return $driver->fetchPage($fetchMode);
 	}
 
+    /**
+     * 获取结果集和总数量
+     * @param string&array $condition
+     * @param number $rows
+     * @param number $start
+     * @param string $order
+     * @param string $fields
+     * @param number $fetchMode
+     * @return [n,s]
+     */
+    public function paginate($rows = 0, $start = 0, $condition = '', $order='', $fields = '*', $fetchMode=PDO::FETCH_ASSOC) {
+        $driver = $this->driver;
+
+        is_array($condition) and $driver->where($condition[0],$condition[1]);
+
+        $driver->limit($rows,$start)
+            ->orderby($order)
+            ->field($fields);
+        return $driver->fetchPage($fetchMode);
+    }
+
 	/**
 	 * 获取指定首字段为key的结果集
 	 * 如果只有两个字段,则v中没有key值,多于两个字段,则v中包含所有字段

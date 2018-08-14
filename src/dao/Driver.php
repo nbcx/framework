@@ -40,7 +40,7 @@ abstract class Driver extends Access {
 
     protected $join = '';
 
-    protected $w = 'WHERE ';
+    protected $w = ' WHERE ';
     protected $where = '';
 
     protected $having = '';
@@ -967,25 +967,6 @@ abstract class Driver extends Access {
         $sql = str_replace('table.',$this->table.'.',$sql);
         $this->_reset();
         return $this->execute($sql, $params, false);
-        /*
-        if (!empty($condition)) {
-            if (is_array($condition)) {
-                if(is_array($condition[0])) {
-                    $sql .= ' WHERE ' . $this->parseWhere($condition[0]);
-                }
-                else {
-                    $sql .= ' WHERE ' . $condition[0];
-                    $params = array_merge($params, $this->autoarr($condition[1]));
-                }
-            }
-            else {
-                $params = array_merge($params, $this->autoarr($param));
-                $sql .= ' WHERE ' . $condition;
-            }
-        }
-        $sql = str_replace('table.',$this->table.'.',$sql);
-        return $this->db->sql($sql, $params, false);
-        */
     }
 
     function batchUpdate($values, $index, $condition = null,$param=[]) {
@@ -1045,25 +1026,35 @@ abstract class Driver extends Access {
      * @param string $condition
      * @param array $params
      */
-    function delete($condition = '', $params = null) {
+    function delete($condition = '', $params = []) {
         $sql = "DELETE FROM `$this->table`";
+
+        if($this->where) {
+            $sql .= ' '.$this->where;
+        }
+
         if ($condition) {
             if(is_array($condition)) {
-                $sql .= ' WHERE ' . $this->parseWhere($condition[0]);
+                $sql .= $this->w . $this->parseWhere($condition[0]);
             }
             elseif ($params) {
                 //using prepared statement.
                 if (!is_array($params)) {
                     $params = [$params];
                 }
-                $sql .= ' WHERE ' . $condition;
+                $sql .= $this->w . $condition;
+                $this->params = array_merge($this->params, $params);
             }
             else {
-                $sql .= ' WHERE ' . $this->db->quote($condition);
+                $sql .= $this->w . $condition;
             }
         }
+
         $sql = str_replace('table.',$this->table.'.',$sql);
+        $params = $this->params;
+
         $this->_reset();
+
         return $this->execute($sql, $params,false);
     }
 
@@ -1083,7 +1074,7 @@ abstract class Driver extends Access {
         $this->group = '';
         $this->distinct = false;
         $this->limit = '';
-        $this->w = 'WHERE ';
+        $this->w = ' WHERE ';
         $this->sql = '';
         $this->params = [];
     }
