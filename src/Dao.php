@@ -410,16 +410,6 @@ class Dao extends Component {
 	}
 
 	/**
-	 * 在Dao里直接where,并返回Driver对象
-	 * @param $condition
-	 * @param null $params
-	 * @return \nb\src\dao\Driver
-	 */
-	//function where($condition, $params = NULL) {
-	//	return $this->driver->where($condition,$params);
-	//}
-
-	/**
 	 * 表链接
 	 * @param string $table
 	 * @param string $on
