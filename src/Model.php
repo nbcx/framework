@@ -128,7 +128,7 @@ abstract class Model extends Collection {
      * @return array
      */
     public static function findkv($field,$condition = NULL, $params = NULL, $object = true) {
-        return static::dao($object)->findKv($field,$condition, $params);
+        return static::dao($object)->kv($field,$condition, $params);
     }
 
     /**
@@ -165,8 +165,8 @@ abstract class Model extends Collection {
      * @param string $fields
      * @return array
      */
-    public static function findsPage($condition = '', $rows = 0, $start = 0, $order='', $fields = '*', $object = true) {
-        return static::dao($object)->findsPage($condition, $rows, $start, $order, $fields);
+    public static function paginate($rows = 0, $start = 0, $condition = '', $order='', $fields = '*', $object = true) {
+        return static::dao($object)->paginate($rows, $start, $condition, $order, $fields);
     }
 
     /**
@@ -203,38 +203,5 @@ abstract class Model extends Collection {
         });
     }
 
-    /**
-     * @return array
-     */
-    /*
-    public function toArray() {
-        $_arr = [];
-        foreach ($this as $key=>$value) {
-            foreach ($value->_row as $k=>&$v) {
-                $v = $this->$k;
-            }
-            $_arr[] = $value->_row;
-        }
-        return $_arr;
-    }
-    */
-
-    /**
-     * 设定堆栈的值
-     *
-     * @param string $name 值对应的键值
-     * @param mixed $value 相应的值
-     * @return void
-     */
-    /*
-    public function __set($name, $value) {
-        // TODO: Implement __set() method.
-        $method = '___' . $name;
-        if (method_exists($this, $method)) {
-            return $this->$method($value);
-        }
-        return $this->_row[$name] = $value;
-    }
-    */
 
 }

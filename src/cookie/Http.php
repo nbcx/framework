@@ -11,6 +11,7 @@ namespace nb\cookie;
 
 use nb\Config;
 use nb\Pool;
+use nb\Request;
 
 /**
  * Swoole
@@ -23,7 +24,16 @@ use nb\Pool;
  */
 class Http extends Driver {
 
-    protected $config;
+    public $config = [
+        'driver'=>'',
+        'prefix'    => '',// cookie 名称前缀
+        'expire'    => 0,// cookie 保存时间
+        'path'      => '/',// cookie 保存路径
+        'domain'    => '',// cookie 有效域名
+        'secure'    => false,//  cookie 启用安全传输
+        'httponly'  => '',// httponly设置
+        'setcookie' => true,// 是否使用 setcookie
+    ];
 
     protected $request;
 
@@ -35,17 +45,13 @@ class Http extends Driver {
      * @return void
      */
     public function __construct(array $config = []) {
-        $this->config = $config;
-        if (empty($this->config)) {
-            $this->config = Config::getx('cookie');
-        }
+        $config and $this->config = array_merge($this->config,$config);
+
         if (!empty($this->config['httponly'])) {
             ini_set('session.cookie_httponly', 1);
         }
         $this->request  = Pool::value('\swoole\http\Request');
         $this->response = Pool::value('\swoole\http\Response');
-        //$this->request  = \nb\driver\Swoole::$o->request;
-        //$this->response = \nb\driver\Swoole::$o->response;
     }
 
     /**
@@ -187,7 +193,7 @@ class Http extends Driver {
                 $this->response->cookie(
                     $key,
                     '',
-                    Http::obj()->requestTime - 3600,
+                    Request::driver()->requestTime - 3600,
                     $config['path'],
                     $config['domain'],
                     $config['secure'],
