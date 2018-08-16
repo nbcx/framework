@@ -25,7 +25,7 @@ use nb\Pool;
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/3
  */
-class Native extends Driver {
+class Php extends Driver {
 
 	protected $show = [];
     protected $key;

@@ -70,7 +70,7 @@ abstract class Driver {
      * 中断程序运行
      * @param $status
      */
-    public function die($status) {
+    public function quit($status) {
         die($status);
     }
 

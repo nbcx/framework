@@ -18,7 +18,6 @@ namespace nb\view;
  *
  * @package nb\view
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/29
  */

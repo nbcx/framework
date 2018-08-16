@@ -40,7 +40,7 @@ abstract class Driver extends Access {
 
     protected $join = '';
 
-    protected $w = 'WHERE ';
+    protected $w = ' WHERE ';
     protected $where = '';
 
     protected $having = '';
@@ -56,11 +56,6 @@ abstract class Driver extends Access {
     protected $data = null;
 
     protected $server = [];
-
-    /*=== CONSTS ===*/
-    const LEFT_JOIN = 'LEFT JOIN';
-    const INNER_JOIN = 'INNER JOIN';
-    const RIGHT_JOIN = 'RIGHT JOIN';
 
     protected $exp = [
         'eq'=>'=',
@@ -136,7 +131,7 @@ abstract class Driver extends Access {
      * @param $tableAlias
      * @return Driver
      */
-    function table($tableName) {
+    function ___table($tableName) {
         $this->name = $tableName;
         $this->table = $this->prefix.$tableName;
         return $this;
@@ -183,8 +178,9 @@ abstract class Driver extends Access {
      * @return Driver
      */
     function sql($sql = null, $params = NULL) {
-        $this->sql = $sql;
-        $this->params = $this->_autoarr($params);
+        $params = $this->autoarr($params);
+        $sql = str_replace('table.',$this->alias.'.',$sql);
+        return $this->execute($sql, $params);
         return $this;
     }
 
@@ -192,7 +188,14 @@ abstract class Driver extends Access {
      * 删除表
      */
     public function truncate() {
-        $this->sql('TRUNCATE `'.$this->table.'`');
+        $this->execute('TRUNCATE `'.$this->table.'`');
+    }
+
+    /**
+     * 删除表
+     */
+    function drop() {
+        return $this->execute("DROP TABLE $this->table");
     }
 
     /**
@@ -200,14 +203,9 @@ abstract class Driver extends Access {
      * @param $fieldName
      * @return Driver
      */
-    function field($fieldName) {
+    public function field($fieldName) {
         if ($this->fields && $this->fields != '*') {
-            if($fieldName != '*') {
-                $this->fields = $fieldName . ",$this->fields";
-            }
-            else {
-                $this->fields .= ',' . $fieldName;
-            }
+            $fieldName != '*' and $this->fields = $fieldName . ",$this->fields";
         }
         else {
             $this->fields = $fieldName;
@@ -239,7 +237,7 @@ abstract class Driver extends Access {
      * @param String $jointype
      * @return Driver
      */
-    function join($table, $on = '', $server=null,$fields = '', $jointype = self::INNER_JOIN) {
+    public function join($table, $on = '', $server=null,$fields = '', $jointype = 'INNER JOIN') {
         $as = $table;
         if (strchr($table, ' ')) {
             $tmp = explode(' ', str_replace(' as ', ' ', $table));
@@ -283,7 +281,7 @@ abstract class Driver extends Access {
      * @return Driver
      */
     function right($table, $on = '', $server=null,  $fields = '') {
-        return $this->join($table, $on, $server, $fields, self::RIGHT_JOIN);
+        return $this->join($table, $on, $server, $fields, 'RIGHT JOIN');
     }
 
     /**
@@ -293,7 +291,7 @@ abstract class Driver extends Access {
      * @return Driver
      */
     function inner($table, $on = '', $server=null,  $fields = '') {
-        return $this->join($table, $on, $server, $fields, self::INNER_JOIN);
+        return $this->join($table, $on, $server, $fields, 'LEFT JOIN');
     }
 
     /**
@@ -308,7 +306,7 @@ abstract class Driver extends Access {
             }
             else {
                 $this->where .= $this->w . $condition;
-                $params !== NULL && ($this->params = array_merge($this->params,$this->_autoarr($params)));
+                $params !== NULL && ($this->params = array_merge($this->params,$this->autoarr($params)));
             }
             $this->w = ' and ';
         }
@@ -634,7 +632,7 @@ abstract class Driver extends Access {
      */
     function having($condition, $params = NULL) {
         $this->having = 'HAVING ' . $condition;
-        $params && ($this->params = array_merge($this->params, $this->_autoarr($params)));
+        $params && ($this->params = array_merge($this->params, $this->autoarr($params)));
         return $this;
     }
 
@@ -686,6 +684,7 @@ abstract class Driver extends Access {
             if (!empty($this->having)) $groupby .= ' ' . $this->having;
         }
         $order = !empty($this->order) ? "ORDER BY $this->order" : '';
+
         $this->fields = $this->fields?$this->fields:'*';
         $sql = "SELECT $distinct $this->fields FROM `$this->table` $this->alias $this->join $this->where $groupby $order $this->limit";
         $sql = str_replace('table.',$this->alias.'.',$sql);
@@ -747,7 +746,7 @@ abstract class Driver extends Access {
      * 获取结果集和数量
      * @return [int,array]
      */
-    public function fetchPage($fetchMode = PDO::FETCH_ASSOC) {
+    public function paginate($fetchMode = PDO::FETCH_ASSOC) {
         $distinct = $this->distinct ? 'DISTINCT' : '';
         $groupby = '';
         if (!empty($this->group)) {
@@ -799,7 +798,7 @@ abstract class Driver extends Access {
      *
      * @return array|bool
      */
-    function fetchKv($map=null){
+    function kv($map=null){
         $filed = $this->fields;
         $map = $map?:$filed;
         $filed = explode(',',$map);
@@ -967,25 +966,6 @@ abstract class Driver extends Access {
         $sql = str_replace('table.',$this->table.'.',$sql);
         $this->_reset();
         return $this->execute($sql, $params, false);
-        /*
-        if (!empty($condition)) {
-            if (is_array($condition)) {
-                if(is_array($condition[0])) {
-                    $sql .= ' WHERE ' . $this->parseWhere($condition[0]);
-                }
-                else {
-                    $sql .= ' WHERE ' . $condition[0];
-                    $params = array_merge($params, $this->autoarr($condition[1]));
-                }
-            }
-            else {
-                $params = array_merge($params, $this->autoarr($param));
-                $sql .= ' WHERE ' . $condition;
-            }
-        }
-        $sql = str_replace('table.',$this->table.'.',$sql);
-        return $this->db->sql($sql, $params, false);
-        */
     }
 
     function batchUpdate($values, $index, $condition = null,$param=[]) {
@@ -1024,11 +1004,11 @@ abstract class Driver extends Access {
                 }
                 else {
                     $where .= $condition[0];
-                    $params = array_merge($params, $this->_autoarr($condition[1]));
+                    $params = array_merge($params, $this->autoarr($condition[1]));
                 }
             }
             else {
-                $params = array_merge($params, $this->_autoarr($param));
+                $params = array_merge($params, $this->autoarr($param));
                 $where .= ' WHERE ' . $condition;
             }
             $where .= ' AND ';
@@ -1045,34 +1025,39 @@ abstract class Driver extends Access {
      * @param string $condition
      * @param array $params
      */
-    function delete($condition = '', $params = null) {
+    function delete($condition = '', $params = []) {
         $sql = "DELETE FROM `$this->table`";
+
+        if($this->where) {
+            $sql .= ' '.$this->where;
+        }
+
         if ($condition) {
             if(is_array($condition)) {
-                $sql .= ' WHERE ' . $this->parseWhere($condition[0]);
+                $sql .= $this->w . $this->parseWhere($condition[0]);
             }
             elseif ($params) {
                 //using prepared statement.
                 if (!is_array($params)) {
                     $params = [$params];
                 }
-                $sql .= ' WHERE ' . $condition;
+                $sql .= $this->w . $condition;
+                $this->params = array_merge($this->params, $params);
             }
             else {
-                $sql .= ' WHERE ' . $this->db->quote($condition);
+                $sql .= $this->w . $condition;
             }
         }
+
         $sql = str_replace('table.',$this->table.'.',$sql);
+        $params = $this->params;
+
         $this->_reset();
+
         return $this->execute($sql, $params,false);
     }
 
-    /**
-     * 删除表
-     */
-    function dropTable() {
-        return $this->execute("DROP TABLE $this->table");
-    }
+
 
     private function _reset() {
         $this->fields = '*';
@@ -1083,7 +1068,7 @@ abstract class Driver extends Access {
         $this->group = '';
         $this->distinct = false;
         $this->limit = '';
-        $this->w = 'WHERE ';
+        $this->w = ' WHERE ';
         $this->sql = '';
         $this->params = [];
     }
@@ -1094,22 +1079,6 @@ abstract class Driver extends Access {
             return new $object($data);
         }
         return $data;
-    }
-
-    /**
-     * 执行一条SQL语句
-     * @param unknown $sql
-     * @param string $params
-     */
-    private function exec($sql, $params = NULL) {
-        if (func_num_args() == 2) {
-            $params = $this->_autoarr($params);
-        }
-        else {
-            $params = func_get_args();
-            array_shift($params);
-        }
-        return $this->execute($sql, $params);
     }
 
     /**
@@ -1140,7 +1109,7 @@ abstract class Driver extends Access {
         throw new \Exception($error);
     }
 
-    private function _autoarr($params) {
+    private function autoarr($params) {
         if (!is_null($params) && !is_array($params)) {
             $params = [$params];
         }

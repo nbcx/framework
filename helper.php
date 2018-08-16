@@ -86,7 +86,7 @@ function l($data, $fileName = 'log', $ext='txt', $format='Ymd') {
  * @throws Exception
  */
 function quit($msg=null) {
-    \nb\Debug::die($msg);
+    \nb\Debug::quit($msg);
 }
 
 function val() {

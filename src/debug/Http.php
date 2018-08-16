@@ -7,7 +7,6 @@
  */
 namespace nb\debug;
 
-use nb\Http;
 use nb\Request;
 use nb\Router;
 use nb\Session;
@@ -22,7 +21,7 @@ use nb\Pool;
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/3
  */
-class Swoole extends Native {
+class Http extends Php {
 
 	private $synchronous = true;
 
@@ -111,7 +110,7 @@ class Swoole extends Native {
      * 中断程序运行
      * @param $status
      */
-	public function die($status) {
+	public function quit($status) {
 	    if($this->died) {
 	       return;
         }

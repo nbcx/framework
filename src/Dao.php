@@ -23,10 +23,11 @@ use PDO;
  * @author: collin <collin@nb.cx>
  * @date: 2017/3/30
  *
- * @method static \nb\dao\Mysql fe($distinct = false)
- *
  * @method \nb\dao\Driver field($fieldName)
+ * @method \nb\dao\Driver left($table, $on = '', $server=null, $fields = '')
  * @method \nb\dao\Driver where($condition, $params = NULL)
+ * @method \nb\dao\Driver orderby($order)
+ * @method \nb\dao\Driver truncate() 删除表
  *
  * @property  PDO db
  */
@@ -36,7 +37,7 @@ class Dao extends Component {
 	 * Driver对象
 	 * @var \nb\dao\Driver
 	 */
-	public $driver = null;
+	public $driver;
 
     public static function config($name = 'dao') {
         // TODO: Implement config() method.
@@ -48,79 +49,45 @@ class Dao extends Component {
         return $name;
     }
 
+    public function __construct($table=null,$pk='id',$config = 'dao') {
+        $config = is_array($config)?:static::config($config);
+
+        $this->driver = static::create($table,$pk,$config);
+    }
+
+    /**
+     * 创建并返回一个驱动对象
+     * 此函数创建的对象，非单列对象
+     *
+     * @return \nb\dao\Driver
+     */
+    public static function create(...$args) {
+        list($table,$pk,$config) = $args;
+        $class = get_called_class();
+        if($table===null) {
+            $class = explode('\\',$class);
+            $table = end($class);
+        }
+        $class = static::parse(get_class(),$config);
+        return new $class($table,$pk,$config);
+    }
+
     /**
      * 获取驱动对象
-     * @return mixed|null
+     * @return \nb\dao\Driver
      */
-    public static function driver($table=null,$pk='id',$server = 'dao'){
+    public static function driver($table=null,$pk='id',$config = 'dao'){
         $class = get_called_class();
-        $key = $class.':'.$table.':'.(is_string($server)?$server:md5(json_encode($server)));
-        $driver = Pool::get($key);
+        $key = $class.':'.$table.':'.(is_string($config)?$config:md5(json_encode($config)));
 
-        if($driver) {
+        if($driver = Pool::get($key)) {
             return $driver;
         }
-        if($table===null) {
-            $table = end(explode('\\',$class));
-        }
-        $config  = static::config();
 
-        $driver  = self::parse(get_class(),$config);
+        $config = is_array($config)?:static::config($config);
 
-        $driver  = new $driver($table,$pk,$config);
-
-        Pool::set($key,$driver);
-
-        return $driver;
+        return Pool::set($key,static::create($table,$pk,$config));
     }
-
-
-	public static function query() {
-
-    }
-
-    public static function execute() {
-
-    }
-
-    /**
-     * 获取对象
-     * @return $this
-     */
-    public static function table($tableName=null,$id='id',$server = 'dao'){
-        $obj = get_called_class();
-        $alias = $obj;
-        if('nb\Dao' == $obj) {
-            $alias .= '@'.$tableName;
-        }
-        return Pool::object($alias,$obj,[
-            $tableName,
-            $id,
-            $server
-        ]);
-    }
-
-
-	/**
-	 * 设置表名
-	 * @param $tableName
-     * @return Dao
-	 */
-	/*
-	public function table($tableName) {
-		if (strchr($tableName, ' ')) {
-			$tmp = explode(' ', str_replace(' as ', ' ', $tableName));
-			$tableName = $tmp[0];
-			$tableAlias = $tmp[1];
-		}
-		else {
-			$tableAlias = $tableName;
-		}
-		$this->driver->table($tableName);
-		$this->driver->alias($tableAlias);
-        return $this;
-	}
-	*/
 
 	/**
 	 * 设置表别名
@@ -141,15 +108,6 @@ class Dao extends Component {
         return $this;
     }
 
-
-    /**
-     * @param $fieldName
-     * @return dao\Driver
-     */
-	//public function field($fieldName) {
-	//    return $this->driver->field($fieldName);
-    //}
-	
     /**
      * 向数据库添加一条数据
      *
@@ -175,7 +133,7 @@ class Dao extends Component {
 	 * @param array $arr 要添加的数据
 	 * @param string $upstr 要执行的修改语句
 	 */
-	public function insertOrUpdate($arr,$upstr = null){
+	public function insertup($arr,$upstr = null){
 		return $this->driver->insertOrUpdate($arr,$upstr);
 	}
 	
@@ -185,16 +143,6 @@ class Dao extends Component {
 	 * @param array $arr
 	 */
 	public function updateId($id, $data, $params=[], $filter=false) {
-	    /*
-	    if($params && !is_array($params) && is_array($data)) {
-            $filter = $params;
-            $params = [];
-            $data = array_filter($data,$filter);
-        }
-        if($this->validate && !$this->_validate($data)) {
-            return false;
-        }
-	    */
 		return $this->driver->where("{$this->driver->id}=?", [$id])->update($data,$params);
 	}
 
@@ -204,14 +152,6 @@ class Dao extends Component {
 	 * @param array $arr
 	 */
 	public function update($arr, $condition=null, $params=[], $filter=false) {
-	    /*
-        if($filter && is_array($arr)) {
-            $arr = array_filter($arr);
-            if($this->validate && !$this->_validate($arr)) {
-                return false;
-            }
-        }
-	    */
 		if($condition) {
 			$this->driver->where($condition, $params);
 		}
@@ -273,30 +213,6 @@ class Dao extends Component {
 	}
 
 	/**
-	 * 获取唯一结果
-	 * @param string&array $condition
-	 * @param string $fields
-	 * @param number $rows
-	 * @param number $start
-	 * @param string $order
-	 */
-	public function findsUnique($condition = '', $fields = '', $rows = 0, $start = 0, $order='') {
-		if (is_array($condition)) {
-			$where = $condition[0];
-			$params = $condition[1];
-		} else {
-			$where = $condition;
-			$params = null;
-		}
-		return $this->driver->field($fields)
-            ->where($where, $params)
-            ->orderby($order)
-            ->limit($rows, $start)
-            ->fetchAllUnique();
-	}
-
-	
-	/**
 	 * 获取一条结果
 	 * @param $condition
 	 * @param null $params
@@ -356,24 +272,23 @@ class Dao extends Component {
 	}
 
 
-	/**
-	 * 获取结果集和数总量
-	 * @param string&array $condition
-	 * @param number $rows
-	 * @param number $start
-	 * @param string $order
-	 * @param string $fields
-	 * @param number $fetchMode
-	 * @return array(n,s)
-	 */
-	public function findsPage($condition = '', $rows = 0, $start = 0, $order='', $fields = '*', $fetchMode=PDO::FETCH_ASSOC) {
-        $driver = $this->driver
-            ->where($condition[0],$condition[1])
-            ->limit($rows,$start)
-            ->orderby($order)
-            ->field($fields);
-        return $driver->fetchPage($fetchMode);
-	}
+    /**
+     * 获取结果集和总数量
+     * @param string&array $condition
+     * @param number $rows
+     * @param number $start
+     * @param string $order
+     * @param string $fields
+     * @param number $fetchMode
+     * @return [n,s]
+     */
+    public function paginate($rows = 0, $start = 0, $condition = '', $order='', $fields = '*', $fetchMode=PDO::FETCH_ASSOC) {
+        $driver = $this->driver;
+        is_array($condition) and $driver->where($condition[0],$condition[1]);
+        $order and $driver->orderby($order);
+        $driver->limit($rows,$start)->field($fields);
+        return $driver->paginate($fetchMode);
+    }
 
 	/**
 	 * 获取指定首字段为key的结果集
@@ -383,11 +298,11 @@ class Dao extends Component {
 	 * @param null $params
 	 * @return array
 	 */
-	public function findKv($field,$condition = NULL, $params = NULL){
+	public function kv($field,$condition = NULL, $params = NULL) {
 		return $this->driver
             ->field($field)
             ->where($condition,$params)
-            ->fetchKv();
+            ->kv();
 	}
 
 	
@@ -436,16 +351,6 @@ class Dao extends Component {
 	}
 
 	/**
-	 * 在Dao里直接where,并返回Driver对象
-	 * @param $condition
-	 * @param null $params
-	 * @return \nb\src\dao\Driver
-	 */
-	//function where($condition, $params = NULL) {
-	//	return $this->driver->where($condition,$params);
-	//}
-
-	/**
 	 * 表链接
 	 * @param string $table
 	 * @param string $on
@@ -487,34 +392,4 @@ class Dao extends Component {
 		return $this->driver->sql();
 	}
 
-	/**
-	 * 获取当前DAO对应的数据表表名
-	 * @return string
-	 */
-	public function tblName($needPrefix=false) {
-		return $this->driver->getTable($needPrefix);
-	}
-	
-	/**
-	 * 删除表
-	 */
-	public function truncate() {
-		$this->driver->truncate();
-	}
-
-
-    /**
-     * 对象方法的静态调用
-     * @param $name
-     * @param $arguments
-     * @return mixed|null
-     */
-    //public static function __callStatic($name, $arguments) {
-    //    $method =substr($name,1);
-    //    $that = self::driver();
-    //    if (method_exists($that, $method)) {
-    //        return call_user_func_array([$that,$method],$arguments);
-    //    }
-    //    return null;
-    //}
 }

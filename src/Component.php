@@ -14,7 +14,6 @@ namespace nb;
  *
  * @package nb
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2018/7/25
  */
@@ -23,24 +22,48 @@ abstract class Component {
     protected $driver;
 
     public function __construct() {
+        $args = func_get_args();
+        $args[] = static::config();
+        //array_unshift($args,static::config());
         $this->driver =  call_user_func_array(
-            'static::driver',
-            func_get_args()
+            'static::create',
+            $args
         );
     }
 
     /**
-     * 获取驱动对象
-     * @return mixed|null
+     * 创建并返回一个驱动对象
+     * 此函数创建的对象，非单列对象
+     */
+    public static function create(...$args) {
+        $alias = get_called_class();
+
+        $config = end($args)?:[];
+        $class = self::parse($alias,$config);
+
+        return Pool::make($class,$args);
+    }
+
+    /**
+     * 获取驱动对象，以单列的模式保存在对象池里
+     * @return driver
      */
     public static function driver(){
         $alias = get_called_class();
         if($driver = Pool::get($alias)) {
             return $driver;
         }
+
         $args = func_get_args();
         $config = static::config();
+        $config and array_unshift($args,$config);
+        $class =  call_user_func_array(
+            'static::create',
+            $args
+        );
 
+        return Pool::set($alias,$class);
+        /*
         if(func_num_args()>0) {
             $args[] = $config;
         }
@@ -50,14 +73,11 @@ abstract class Component {
         $class = self::parse($alias,$config);
 
         return Pool::object($alias,$class,$args);
-        /*
-        $reflection = new \ReflectionClass($class);
-
-        return Pool::set($alias,call_user_func_array(
-            [&$reflection, 'newInstance'],
-            $args
-        ));
         */
+    }
+
+    public static function replace() {
+
     }
 
     /**
@@ -69,74 +89,38 @@ abstract class Component {
     protected static function parse($class,$config) {
         $class = strtolower($class);
         if(isset($config['driver']) && $config['driver']) {
-
             if(strpos('/',$config['driver'])) {
                 $class = $config['driver'];
             }
             else {
                 //如果无'/'，表明驱动为内置类
-                $class .= '\\'.ucfirst($config['driver']);
+                $class .= '\\' . ucfirst($config['driver']);
             }
+            return $class;
+        }
+        $driver = $class . '\\' . ucfirst(Config::$o->sapi);
+
+        if(class_exists($driver)) {
+            $class = $driver;
         }
         else {
-            switch (Config::$o->sapi) {
-                case 'swoole':
-                    $class .= class_exists($class . '\\Swoole')?'\\Swoole':'\\Native';
-                    break;
-                case 'cli':
-                    $class .= class_exists($class . '\\Command')?'\\Command':'\\Native';
-                    break;
-                default :
-                    $class .= '\\Native';
-                    break;
-            }
+            $class .= '\\Base';
         }
         return $class;
     }
 
+    /**
+     * 根据组件类名获取框架配置里的设置
+     * @return mixed|null
+     */
     public static function config() {
-        get_called_class();
+        $key = explode('\\',get_called_class());
+        $key = strtolower(end($key));
+        if(isset(Config::$o->$key)) {
+            return Config::$o->$key;
+        }
         return null;
     }
-
-    /**
-     * 绑定类的静态代理
-     *
-     * @static
-     * @access public
-     * @param  string|array  $name    类标识
-     * @param  string        $class   类名
-     * @return object
-     */
-    public static function bind($name, $class = null) {
-        if($class) {
-            Pool::object($name,$class);
-        }
-        else{
-            Pool::object(get_called_class(),$name);
-        }
-    }
-
-    /**
-     * 切换驱动对象
-     *
-     * @param $config
-     * @return mixed
-     */
-    public static function change($config) {
-        $class = get_called_class();
-        $driver = is_array($config)?$config['driver']:$config;
-        if(strpos('/',$driver)) {
-            $class = $driver;
-        }
-        else {
-            $class = strtolower($class);
-            //如果无'/'，表明驱动为内置类
-            $class .= '\\'.ucfirst($driver);
-        }
-        return Pool::set($class,new $class($config));
-    }
-
 
     /**
      * 清除内存池里的驱动对象

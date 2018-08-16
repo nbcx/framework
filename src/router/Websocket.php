@@ -10,18 +10,70 @@
 namespace nb\router;
 
 use nb\Config;
-use nb\Request;
+use nb\Pool;
 
 /**
- * Swoole Http Server 模式下的路由处理
+ * Command
  *
  * @package nb\router
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
- * @date: 2017/11/29
+ * @date: 2018/8/7
  */
-class Swoole extends Native {
+class Websocket extends Driver {
+
+    /**
+     * 当前路由名称
+     *
+     * @access public
+     * @var string
+     */
+    public $current;
+
+    public function _pathinfo() {
+        $url = Config::$o->argv;
+        if(isset($url[1])) {
+            return $url[1];
+        }
+        return '';
+    }
+
+    /**
+     * 路由必须解析
+     * 如果没有解析,将根据参数重新解析
+     */
+    public function mustAnalyse(){
+        if($this->controller) {
+            return true;
+        }
+        $url = $this->pathinfo;
+
+        $sys = Config::$o;
+        if(!$url) {
+            $url = $sys->default_index;
+        }
+        $url = explode('/', $url);
+        switch (count($url)) {
+            case 0:
+            case 1:
+                $this->controller = $url[0];
+                break;
+            case 2:
+                $this->controller = $url[0];
+                $this->function = $url[1];
+                break;
+            default:
+                $this->module = $url[0];
+                $this->controller = $url[1];
+                $this->function = $url[2];
+                break;
+        }
+        return $this;
+    }
+
+    protected function _folder_default(){
+        return Config::$o->folder_controller;
+    }
 
     protected function _class() {
         $module = $this->module;

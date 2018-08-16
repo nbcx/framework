@@ -259,12 +259,12 @@ class Ask {
 
         switch (true) {
             case null === $default:
-                $text = sprintf(' <info>%s</info>:', $text);
+                $text = sprintf('<info>%s</info>:', $text);
 
                 break;
 
             case $this->question instanceof Confirmation:
-                $text = sprintf(' <info>%s (yes/no)</info> [<comment>%s</comment>]:', $text, $default ? 'yes' : 'no');
+                $text = sprintf('<info>%s (yes/no)</info> [<comment>%s</comment>]:', $text, $default ? 'yes' : 'no');
 
                 break;
 
@@ -276,18 +276,18 @@ class Ask {
                     $default[$key] = $choices[trim($value)];
                 }
 
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, implode(', ', $default));
+                $text = sprintf('<info>%s</info> [<comment>%s</comment>]:', $text, implode(', ', $default));
 
                 break;
 
             case $this->question instanceof Choice:
                 $choices = $this->question->getChoices();
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $choices[$default]);
+                $text = sprintf('<info>%s</info> [<comment>%s</comment>]:', $text, $choices[$default]);
 
                 break;
 
             default:
-                $text = sprintf(' <info>%s</info> [<comment>%s</comment>]:', $text, $default);
+                $text = sprintf('<info>%s</info> [<comment>%s</comment>]:', $text, $default);
         }
 
         $this->output->writeln($text);
@@ -300,7 +300,7 @@ class Ask {
             }
         }
 
-        $this->output->write(' > ');
+        $this->output->write('> ');
     }
 
     private function getShell() {

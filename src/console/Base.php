@@ -27,7 +27,7 @@ use nb\console\output\Output;
  * @property  string $name
  * @property  string $version 版本号
  */
-class Native extends Driver {
+class Base extends Driver {
 
     //private $name;
     //private $version;
@@ -60,7 +60,7 @@ class Native extends Driver {
      * @param  string $version 版本
      * @param null|string $user 执行用户
      */
-    public function __construct($config) {
+    public function __construct($config=[]) {
         //$name = 'UNKNOWN', $version = 'UNKNOWN', $user = null
         $config = array_merge($this->config,$config);
         if(isset($config['commands']) && is_array($config['commands'])) {

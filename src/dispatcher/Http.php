@@ -24,7 +24,7 @@ use nb\Pool;
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/3
  */
-class Swoole extends Native {
+class Http extends Php {
 
     protected $config = [
         'path'=>__APP__,

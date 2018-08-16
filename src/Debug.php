@@ -72,8 +72,8 @@ class Debug extends Component {
      * @param null $msg
      * @throws Exception
      */
-    public static function die($msg=null) {
-        self::driver()->die($msg);
+    public static function quit($msg=null) {
+        self::driver()->quit($msg);
     }
 
     /**
@@ -156,7 +156,7 @@ class Debug extends Component {
         if(!Config::$o->debug) return;
         $args = func_get_args();
         $args and call_user_func_array('\nb\Debug::e',$args);
-        quit(0);
+        self::quit(0);
     }
 
     /**

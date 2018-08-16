@@ -92,6 +92,8 @@ abstract class Pool {
             $namespace = $alias;
         }
 
+        $constructor = static::make($namespace,$args);
+        /*
         $reflect = new \ReflectionClass($namespace);
         $constructor = $reflect->getConstructor();
         if (!$constructor || $constructor->getNumberOfParameters() == 0) {
@@ -100,6 +102,7 @@ abstract class Pool {
         else {
             $constructor = $reflect->newInstanceArgs($args);
         }
+        */
 
         //固化
         if(isset(Config::$o->pool[$alias])) {
@@ -107,12 +110,25 @@ abstract class Pool {
         }
 
         return self::$pool[$alias] = $constructor;
+    }
 
-        //return self::$pool[$alias] = $reflect->newInstanceArgs($args);
-
-
-        //self::$pool[$alias] = call_user_func_array([&$reflection, 'newInstance'],$args);
-        //return self::$pool[$alias];
+    /**
+     * 实例对象制作器
+     * @param $namespace
+     * @param array $args
+     * @return object|\ReflectionMethod
+     * @throws \ReflectionException
+     */
+    public static function make($namespace,$args=[]) {
+        $reflect = new \ReflectionClass($namespace);
+        $constructor = $reflect->getConstructor();
+        if (!$constructor || $constructor->getNumberOfParameters() == 0) {
+            $constructor = $reflect->newInstance();
+        }
+        else {
+            $constructor = $reflect->newInstanceArgs($args);
+        }
+        return $constructor;
     }
 
 

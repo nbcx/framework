@@ -26,19 +26,12 @@ use nb\server\assist\Swoole;
  */
 class Http extends Swoole {
 
-    /**
-     * @var \swoole\http\Server
-     */
-    public $server;
-
-    public $workid;//当前work进程的id
-
     //必须的默认的配置
     protected $options = [
         'driver'=>'tcp',
         'register'=>'nb\\event\\Swoole',//注册一个类，来实现swoole自定义事件
         'host'=>'0.0.0.0',
-        'port'=>9502,
+        'port'=>9501,
         'max_request'=>'',//worker进程的最大任务数
         'worker_num'=>'',//设置启动的worker进程数。
         'dispatch_mode'=>2,//据包分发策略,默认为2
@@ -70,54 +63,39 @@ class Http extends Swoole {
         'managerStop'
     ];
 
-    public function __construct($options=[]) {
-        $this->options = array_merge($this->options,$options);
-        $register = get_class_methods($this->options['register']);
-        $register and $this->call = array_intersect($this->call,$register);
-    }
-
     /**
      * 启动Swoole服务
      */
     public function run() {
         //设置server参数
-        $ser = $this->server = new \swoole\http\Server(
+        $server =  new \swoole\http\Server(
             $this->options['host'],
             $this->options['port']
         );
-        $ser->set($this->options);
+        $server->set($this->options);
 
         //设置server回调事件
-        $ser->on('request',    [$this,'request']);
+        $server->on('request',    [$this,'request']);
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
-            $ser->on($v,[$callback,$v]);
+            $server->on($v,[$callback,$v]);
         }
-        Config::$o->sapi='swoole';
-        $ser->start();
+
+        $this->swoole = $server;
+        $server->start();
     }
 
     public function request(\swoole\http\Request $request, \swoole\http\Response $response) {
         try {
+            Config::$o->sapi='http';
             ob_start();
             Pool::destroy();
-            Pool::value('\swoole\http\Request', $request);
-            Pool::value('\swoole\http\Response',$response);
+            Pool::set('\swoole\http\Request', $request);
+            Pool::set('\swoole\http\Response',$response);
             Dispatcher::run();
         }
         catch (\Throwable $e) {
-            //因为需要模拟die函数,所以此处需要catch处理
-            if($e->getMessage() !== 'die') {
-                throw new \ErrorException(
-                    $e->getMessage(),
-                    $e->getCode(),
-                    1,
-                    $e->getFile(),
-                    $e->getLine(),
-                    $e->getPrevious()
-                );
-
-            }
+            $this->error($e);
         }
         Debug::end();
         $response->end(ob_get_contents());

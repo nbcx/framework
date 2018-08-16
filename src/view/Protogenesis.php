@@ -12,15 +12,14 @@ namespace nb\view;
 /**
  * Php
  *
- * ThinkPHP分离出来的模板引擎
+ * 使用原生PHP语言模版
  *
  * @package nb\view
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/29
  */
-class Php {
+class Protogenesis {
 
     // 模板引擎参数
     protected $config = [
@@ -70,11 +69,9 @@ class Php {
         }
         // 模板不存在 抛出异常
         if (!is_file($template)) {
-            throw new TemplateNotFoundException('template not exists:' . $template, $template);
+            throw new \Exception('template not exists:' . $template, $template);
         }
         $this->template = $template;
-        // 记录视图信息
-        App::$debug && Log::record('[ VIEW ] ' . $template . ' [ ' . var_export(array_keys($data), true) . ' ]', 'info');
 
         extract($data, EXTR_OVERWRITE);
         include $this->template;

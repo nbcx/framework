@@ -18,7 +18,7 @@ namespace nb\i18n;
  * @author: collin <collin@nb.cx>
  * @date: 2018/1/19
  */
-class Native extends Driver {
+class Base extends Driver {
     /**
      * 当前语言
      * @var array

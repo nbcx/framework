@@ -59,13 +59,12 @@ class Framework {
         //}
         if (Config::$o->debug) {
             $hint = I18n::t('请求无法应答！');
-            $message = I18n::t(
-                '请检查下面路由信息是否正确！ %s%s%s%s',
+            $message = I18n::t('请检查下面路由信息是否正确！ %s%s%s%s',[
                 '<br/>module : '.$router->module,
                 '<br/>folder : '.$router->folder,
                 '<br/>controller : '.$router->controller,
                 '<br/>function : '.$router->function
-            );
+            ]);
         }
         include __DIR__ . DS . 'html' . DS . 'hint.tpl.php';
     }
@@ -153,7 +152,6 @@ class Framework {
      * @return bool  返回false时，将作为未启用module处理
      */
     public function module($module) {
-
         $conf = Config::$o;
         $conf_file = __APP__.$conf->folder_module.DS.$module.DS.'config.inc.php';
         if(is_file($conf_file)) {
@@ -184,6 +182,19 @@ class Framework {
             );
         }
         return true;
+    }
+
+    /**
+     * 解析websocket,tcp的路由
+     * @param $data 客服端发送数据
+     * @return string
+     */
+    public function parser(&$data) {
+        $data = json_decode($data,true);
+        is_null($data) and trigger_error('The data must be a JSON string');
+        $action = isset($data['action'])?$data['action']:'';
+        unset($data['action']);
+        return $action;
     }
 
 }

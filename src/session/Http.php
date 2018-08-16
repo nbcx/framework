@@ -9,8 +9,10 @@
  */
 namespace nb\session;
 
+use nb\Cookie;
+
 /**
- * Native
+ * Swoole
  *
  * @package nb\session
  * @link https://nb.cx
@@ -18,10 +20,32 @@ namespace nb\session;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/29
  */
-class Native extends Driver {
+class Http extends Driver {
+
+    /**
+     * @var \SessionHandler
+     */
+    protected $hander;
+
+    protected $sessionKey = 'PHPSESSID';
+
+    protected $sessionID;
 
     protected $prefix = '';
-    //private $init = null;
+
+    //当前session数据
+    protected $data = [];
+
+    protected $options = [
+        'driver'=>'',
+        'name'=>'',
+        'path'=>'',
+        'expire'             => 10,
+        'var_session_id' => '',// SESSION_ID的提交变量,解决flash上传跨域
+        'prefix'         => 'nb_',// SESSION 前缀
+        'storage'        => 'native',// 驱动方式 支持redis memcache memcached
+        'auto_start'     => true,// 是否自动开启 SESSION
+    ];
 
     /**
      * 设置或者获取session作用域（前缀）
@@ -43,68 +67,38 @@ class Native extends Driver {
      * @return void
      * @throws \Exception
      */
-    public function __construct(array $config = []) {
-        //$isDoStart = false;
-        if (isset($config['use_trans_sid'])) {
-            ini_set('session.use_trans_sid', $config['use_trans_sid'] ? 1 : 0);
-        }
-
-        // 启动session
-        if (!empty($config['auto_start']) && PHP_SESSION_ACTIVE != session_status()) {
-            ini_set('session.auto_start', 0);
-            //$isDoStart = true;
-        }
-
-        if (isset($config['prefix'])) {
-            $this->prefix = $config['prefix'];
-        }
-        if (isset($config['var_session_id']) && isset($_REQUEST[$config['var_session_id']])) {
-            session_id($_REQUEST[$config['var_session_id']]);
-        }
-        elseif (isset($config['id']) && !empty($config['id'])) {
-            session_id($config['id']);
-        }
-        if (isset($config['name'])) {
-            session_name($config['name']);
-        }
-        if (isset($config['path'])) {
-            session_save_path($config['path']);
-        }
-        if (isset($config['domain'])) {
-            ini_set('session.cookie_domain', $config['domain']);
-        }
-        if (isset($config['expire'])) {
-            ini_set('session.gc_maxlifetime', $config['expire']);
-            ini_set('session.cookie_lifetime', $config['expire']);
-        }
-        if (isset($config['secure'])) {
-            ini_set('session.cookie_secure', $config['secure']);
-        }
-        if (isset($config['httponly'])) {
-            ini_set('session.cookie_httponly', $config['httponly']);
-        }
-        if (isset($config['use_cookies'])) {
-            ini_set('session.use_cookies', $config['use_cookies'] ? 1 : 0);
-        }
-        if (isset($config['cache_limiter'])) {
-            session_cache_limiter($config['cache_limiter']);
-        }
-        if (isset($config['cache_expire'])) {
-            session_cache_expire($config['cache_expire']);
-        }
-        if (!empty($config['storage'])) {
-            // 读取session驱动
-            $class = false !== strpos($config['storage'], '\\') ? $config['storage'] : '\\nb\\driver\\session\\storage\\' . ucwords($config['storage']);
-
-            // 检查驱动类
-            if (!class_exists($class) || !session_set_save_handler(new $class($config))) {
-                throw new \Exception('error session handler:' . $class);
+    public function __construct(array $options = []) {
+        $options = $this->options = array_merge($this->options,$options);
+        $class = false !== strpos($options['storage'], '\\') ? $options['storage'] : '\\nb\\session\\storage\\' . ucwords($options['storage']);
+        $this->hander = new $class($options);
+        $this->hander->open($options['path'], $options['name']);
+        $this->sessionID = Cookie::get($this->sessionKey);
+        if ($this->sessionID) {
+            $data = $this->hander->read($this->sessionID);
+            if($data) {
+                $this->data = unserialize($data);
             }
         }
-        session_start();
-        //if ($isDoStart) {
-        //    session_start();
-        //}
+        else {
+            $this->sessionID = self::string(8);
+            Cookie::set($this->sessionKey,$this->sessionID,time() + $config['cache_expire']);
+        }
+    }
+
+    static function string($length = 8, $number = true, $not_o0 = false) {
+        $strings = 'ABCDEFGHIJKLOMNOPQRSTUVWXYZ';  //字符池
+        $numbers = '0123456789';                    //数字池
+        if ($not_o0) {
+            $strings = str_replace('O', '', $strings);
+            $numbers = str_replace('0', '', $numbers);
+        }
+        $pattern = $strings . $number;
+        $max = strlen($pattern) - 1;
+        $key = '';
+        for ($i = 0; $i < $length; $i++) {
+            $key .= $pattern{mt_rand(0, $max)};    //生成php随机数
+        }
+        return $key;
     }
 
     /**
@@ -120,18 +114,19 @@ class Native extends Driver {
             // 二维数组赋值
             list($name1, $name2) = explode('.', $name);
             if ($prefix) {
-                $_SESSION[$prefix][$name1][$name2] = $value;
+                $this->data[$prefix][$name1][$name2] = $value;
             }
             else {
-                $_SESSION[$name1][$name2] = $value;
+                $this->data[$name1][$name2] = $value;
             }
         }
         elseif ($prefix) {
-            $_SESSION[$prefix][$name] = $value;
+            $this->data[$prefix][$name] = $value;
         }
         else {
-            $_SESSION[$name] = $value;
+            $this->data[$name] = $value;
         }
+        $this->hander->write($this->sessionID,serialize($this->data));
     }
 
     /**
@@ -142,27 +137,28 @@ class Native extends Driver {
      */
     public function get($name = '', $prefix = null) {
         $prefix = !is_null($prefix) ? $prefix : $this->prefix;
+        $data = $this->data;
         if ('' == $name) {
             // 获取全部的session
-            $value = $prefix ? (!empty($_SESSION[$prefix]) ? $_SESSION[$prefix] : []) : $_SESSION;
+            $value = $prefix ? (!empty($data[$prefix]) ? $data[$prefix] : []) : $data;
         }
         elseif ($prefix) {
             // 获取session
             if (strpos($name, '.')) {
                 list($name1, $name2) = explode('.', $name);
-                $value = isset($_SESSION[$prefix][$name1][$name2]) ? $_SESSION[$prefix][$name1][$name2] : null;
+                $value = isset($data[$prefix][$name1][$name2]) ? $data[$prefix][$name1][$name2] : null;
             }
             else {
-                $value = isset($_SESSION[$prefix][$name]) ? $_SESSION[$prefix][$name] : null;
+                $value = isset($data[$prefix][$name]) ? $data[$prefix][$name] : null;
             }
         }
         else {
             if (strpos($name, '.')) {
                 list($name1, $name2) = explode('.', $name);
-                $value = isset($_SESSION[$name1][$name2]) ? $_SESSION[$name1][$name2] : null;
+                $value = isset($data[$name1][$name2]) ? $data[$name1][$name2] : null;
             }
             else {
-                $value = isset($_SESSION[$name]) ? $_SESSION[$name] : null;
+                $value = isset($data[$name]) ? $data[$name] : null;
             }
         }
         return $value;
@@ -334,4 +330,5 @@ class Native extends Driver {
         // 暂停session
         session_write_close();
     }
+
 }

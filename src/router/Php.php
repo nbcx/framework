@@ -22,7 +22,7 @@ use nb\router\assist\Parser;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/29
  */
-class Native extends Driver {
+class Php extends Driver {
 
     /**
      * 当前路由名称
@@ -75,7 +75,7 @@ class Native extends Driver {
                 }
                 else {
                     $module = Config::$o->module_register;
-                    if(in_array($url[1],$module)) {
+                    if(is_array($module) && in_array($url[1],$module)) {
                         $this->module = $url[1];
                     }
                     else {

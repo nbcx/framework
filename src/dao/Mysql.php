@@ -51,9 +51,9 @@ class Mysql extends Driver {
                 else if ($fieldName != '*') {
                     $this->fields = $fieldName . ",$this->fields";
                 }
-                else {
-                    $this->fields .= ',' . $fieldName;
-                }
+                //else {
+                //    $this->fields .= ',' . $fieldName;
+                //}
             }
             else {
                 $this->fields = $fieldName;
@@ -115,7 +115,7 @@ class Mysql extends Driver {
      * 获取结果集和数量
      * @return [int,array]
      */
-    public function fetchPage($fetchMode = PDO::FETCH_ASSOC) {
+    public function paginate($fetchMode = PDO::FETCH_ASSOC) {
         $this->fields = $this->fields?$this->fields:'*';
         $this->fields = 'SQL_CALC_FOUND_ROWS '.$this->fields;
         $result = $this->query()->fetchAll($fetchMode);
