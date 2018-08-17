@@ -43,7 +43,8 @@ class Dao extends Component {
         // TODO: Implement config() method.
         if(is_string($name)) {
             $ser = Config::getx($name);
-            $ser or $ser = conf($name);
+
+            $ser or $ser = Config::get($name);//conf($name);
             $name = $ser;
         }
         return $name;
@@ -68,7 +69,13 @@ class Dao extends Component {
             $class = explode('\\',$class);
             $table = end($class);
         }
+
+        if(!$config) {
+            throw new \Exception('dao config not exists!');
+        }
+
         $class = static::parse(get_class(),$config);
+
         return new $class($table,$pk,$config);
     }
 

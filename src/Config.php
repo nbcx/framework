@@ -196,20 +196,6 @@ class Config extends Access {
     //    'ext' => '.cache',
     //];
 
-    //Cookie设置
-    /*
-    public $cookie = [
-        'driver'=>'',
-        'prefix'    => '',// cookie 名称前缀
-        'expire'    => 0,// cookie 保存时间
-        'path'      => '/',// cookie 保存路径
-        'domain'    => '',// cookie 有效域名
-        'secure'    => false,//  cookie 启用安全传输
-        'httponly'  => '',// httponly设置
-        'setcookie' => true,// 是否使用 setcookie
-    ];
-    */
-
     //Session设置
     /*
     public $session = [
@@ -219,28 +205,6 @@ class Config extends Access {
         'prefix'         => 'nb_',// SESSION 前缀
         'type'           => '',// 驱动方式 支持redis memcache memcached
         'auto_start'     => true,// 是否自动开启 SESSION
-    ];
-    */
-
-    //swoole配置
-    /*
-    public $swoole = [
-        'driver'=>'http',
-        'register'=>'nb\\register\\Server',//注册一个类，来实现swoole自定义事件
-        'host'=>'0.0.0.0',
-        'port'=>9502,
-        'max_request'=>'',//worker进程的最大任务数
-        'worker_num'=>'',//设置启动的worker进程数。
-        'dispatch_mode'=>2,//据包分发策略,默认为2
-        'debug_mode'=>3,
-        'enable_gzip'=>0,//是否启用压缩，0为不启用，1-9为压缩等级
-        'enable_log'=>'tmp/swoole-http.log',
-        'enable_pid'=>'/tmp/swoole.pid',
-        'daemonize'=>true,
-
-        'static_path'=>'style/',
-        'static_allow'=>'ico|css|js|jpg|png',
-        'static_expire'=>1800
     ];
     */
 
@@ -305,6 +269,7 @@ class Config extends Access {
         );
 
         Pool::object('nb\\event\\Framework')->config(self::$o);
+
         self::$o->import(self::$o->path_autoinclude);
 
         is_file(self::$o->composer) and require self::$o->composer;

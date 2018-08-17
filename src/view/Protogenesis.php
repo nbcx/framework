@@ -34,6 +34,7 @@ class Protogenesis {
         // 默认模板渲染规则 1 解析为小写+下划线 2 全部转换小写
         'auto_rule' => 1,
     ];
+
     protected $template;
     protected $content;
 
