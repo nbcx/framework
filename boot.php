@@ -23,7 +23,7 @@ spl_autoload_register(function($object) {
         $path = str_replace('\\', '/', $path);
     }
     else{
-        $path = str_replace('\\', '/', $object).'.php';
+        $path = __APP__.str_replace('\\', '/', $object).'.php';
     }
     if(is_file($path)) {
         return require_once($path);
