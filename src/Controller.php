@@ -22,8 +22,10 @@ use nb\view\Driver;
  */
 class Controller {
 
-    public $_rule;
-    public $_message;
+    /**
+     * 获取表单参数的类型，request|post|get等等
+     * @var string
+     */
     public $_method='request';
 
     /**
@@ -42,28 +44,6 @@ class Controller {
 
     protected function display($template='', $vars = [], $config = []) {
         $this->view->display($template, $vars, $config);
-    }
-
-    /**
-     * 对给定字段进行验证,并返回给定字段
-     * @param $scene
-     * @param string $data
-     * @return bool
-     */
-    protected function validate($filed,callable $func=null){
-        $data = Request::driver()->form($this->_method);
-        $validate = Validate::make($this->_rule,$this->_msg);
-        if($filed) {
-            $filed = is_array($filed)?$filed:explode(',',$filed);
-            $validate->scene('_controller_', $filed);
-            $validate->scene('_controller_');
-        }
-        $result = $validate->check($data);
-        if($result) {
-            return $data;
-        }
-        $func = $func?:[$this,'__error'];
-        return call_user_func($func,$validate->getError(),$validate->getFiled());
     }
 
     /**
@@ -99,17 +79,19 @@ class Controller {
         }
 
         //$this->form('get','name','pass');
-
         $method === null and $method = $this->_method;
 
         $form = Request::form($method,$args);
 
-        $va = Validate::instance();
-        $va->scene('_form_', $args);
-        if($va->scene('_form_')->check($form)) {
+        $va = Pool::get(Validate::class);
+        if(!$va) {
             return $form;
         }
-        return $this->__error($va->getError(), $va->getFiled());
+
+        if($va->scene('_form_',$args)->check($form)) {
+            return $form;
+        }
+        return $this->__error($va->error, $va->field);
     }
 
     /**
@@ -211,13 +193,13 @@ class Controller {
     public function __get($name) {
         switch($name) {
             case 'isPost':
-                return Request::ins()->isPost;
+                return Request::driver()->isPost;
             case 'isGet':
-                return Request::ins()->isGet;
+                return Request::driver()->isGet;
             case 'isAjax':
-                return Request::ins()->isAjax;
+                return Request::driver()->isAjax;
             default:
-                $method = '___' . $name;
+                $method = '_' . $name;
                 if (method_exists($this, $method)) {
                     return  $this->$method();
                 }
