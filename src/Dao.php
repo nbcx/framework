@@ -271,11 +271,9 @@ class Dao extends Component {
 	 * @param number $fetchMode
 	 */
 	public function fetchs($condition = NULL, $params = NULL, $fields=null, $order='',$fetchMode=PDO::FETCH_ASSOC) {
-		return $this->driver
-            ->field($fields)
-            ->where($condition, $params)
-            ->orderby($order)
-            ->fetchAll($fetchMode);
+		 $this->driver->field($fields)->where($condition, $params);
+         $order and $this->orderby($order);
+         return  $this->fetchAll($fetchMode);
 	}
 
 

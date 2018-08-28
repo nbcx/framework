@@ -19,7 +19,7 @@ $_ENV['argv'] = isset($argv)?$argv:'';
 spl_autoload_register(function($object) {
     $ex = explode('\\',$object);
     if($ex[0]=='nb') {
-        $path = str_replace($ex[0], __NB__.DS.'src', $object).'.php';
+        $path = str_replace($ex[0], __NB__.'src', $object).'.php';
         $path = str_replace('\\', '/', $path);
     }
     else{
