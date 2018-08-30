@@ -19,6 +19,8 @@ use nb\view\Driver;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2018/7/25
+ *
+ * @property  View view
  */
 class Controller {
 
@@ -27,15 +29,6 @@ class Controller {
      * @var string
      */
     public $_method='request';
-
-    /**
-     * @var Driver
-     */
-    protected $view;
-
-    public function __construct($config=[]) {
-        $this->view = View::ins();//new Template($config);
-    }
 
     protected function assign($name, $value = ''){
         $this->view->assign($name,$value);
@@ -161,7 +154,7 @@ class Controller {
 
         //$this->middle(false);
         if ($condition == false) {
-            return Obj::ins();
+            return new \StdClass();
         }
 
         //创建中间件对象
@@ -192,6 +185,8 @@ class Controller {
 
     public function __get($name) {
         switch($name) {
+            case 'view':
+                return View::driver();
             case 'isPost':
                 return Request::driver()->isPost;
             case 'isGet':

@@ -31,7 +31,7 @@ class Http extends Driver {
     public function __construct() {
         $this->req = Pool::get('\swoole\http\Request');//\nb\driver\Swoole::$o->request;
         if(!$this->req) {
-            $this->req = Obj::ins();
+            $this->req = new \StdClass();
         }
     }
 
