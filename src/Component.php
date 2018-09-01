@@ -89,7 +89,8 @@ abstract class Component {
     protected static function parse($class,$config) {
         $class = strtolower($class);
         if(isset($config['driver']) && $config['driver']) {
-            if(strpos('/',$config['driver'])) {
+
+            if(strpos($config['driver'], '\\') !== false) {
                 $class = $config['driver'];
             }
             else {

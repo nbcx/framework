@@ -162,4 +162,7 @@ class Redis extends Driver {
         return $this->handler->flushDB();
     }
 
+    public function update($name, array $value, $expire = null) {
+
+    }
 }
