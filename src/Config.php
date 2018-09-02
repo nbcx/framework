@@ -262,6 +262,7 @@ class Config extends Access {
         self::$o = new $class($config);
 
         Exception::register();
+
         //后续调整到Config类里
         self::$o->register and Pool::object(
             'nb\\event\\Framework',
@@ -273,6 +274,7 @@ class Config extends Access {
         self::$o->import(self::$o->path_autoinclude);
 
         is_file(self::$o->composer) and require self::$o->composer;
+
     }
 
     /**

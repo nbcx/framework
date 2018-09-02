@@ -49,8 +49,8 @@ abstract class Component {
      * @return driver
      */
     public static function driver(){
-        $alias = get_called_class();
-        if($driver = Pool::get($alias)) {
+        $key = get_called_class();
+        if($driver = Pool::get($key)) {
             return $driver;
         }
 
@@ -62,7 +62,7 @@ abstract class Component {
             $args
         );
 
-        return Pool::set($alias,$class);
+        return Pool::set($key,$class);
     }
 
     public static function replace() {
