@@ -146,7 +146,7 @@ class Redis extends Driver {
      * @return boolean
      */
     public function rm($name) {
-        return $this->handler->delete($this->getCacheKey($name));
+        return $this->handler->delete($name);
     }
 
     /**
