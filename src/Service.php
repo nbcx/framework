@@ -119,6 +119,8 @@ class Service {
             $function = Router::driver()->controller;
         }
 
+        is_array($params) or $params = [$params];
+
         $that->on('success',$callback);
 
         return $that->with($function,$params);
