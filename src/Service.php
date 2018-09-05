@@ -19,9 +19,16 @@ namespace nb;
  */
 class Service {
 
-    public $status = null;//true成功，false失败
+    //true成功，false失败
+    public $status = null;
 
+    //业务执行状态码
+    public $code = 0;
+
+    //业务成功信息
     public $success;
+
+    //业务失败数据
     public $fail;
 
     protected $on = [];
