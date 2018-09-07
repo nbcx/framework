@@ -51,7 +51,7 @@ class Dao extends Component {
     }
 
     public function __construct($table=null,$pk='id',$config = 'dao') {
-        $config = is_array($config)?:static::config($config);
+        $config = is_array($config)?$config:static::config($config);
 
         $this->driver = static::create($table,$pk,$config);
     }
