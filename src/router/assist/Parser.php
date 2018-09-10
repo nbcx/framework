@@ -31,7 +31,7 @@ class Parser {
         'char' => '([^/]%s)',
         'digital' => '([0-9]%s)',
         'alpha' => '([=_0-9a-zA-Z-]%s)',
-        'alphaslash' => '([=_0-9a-zA-Z-/]%s)',
+        'alphaslash' => '([!=_0-9a-zA-Z-/]%s)',
         'split' => '((?:[^/]+/)%s[^/]+)',
     ];
 
