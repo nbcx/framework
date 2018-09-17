@@ -271,7 +271,7 @@ abstract class Driver extends Access {
      * @return Driver
      */
     public function left($table, $on = '', $server=null, $fields = '') {
-        return $this->join($table, $on, $server, $fields, self::LEFT_JOIN);
+        return $this->join($table, $on, $server, $fields, 'LEFT JOIN');
     }
 
     /**

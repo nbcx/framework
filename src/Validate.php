@@ -189,9 +189,10 @@ class Validate extends Access {
      * @param  array $field 验证字段描述信息
      */
     public function __construct(array $rules = [], array $message = [], array $field = []) {
-        $this->rule = $rules + $this->rule;
-        $this->message = array_merge($this->message, $message);
-        $this->field = array_merge($this->field, $field);
+        //$this->rule = $rules + $this->rule;
+        //$this->message = array_merge($this->message, $message);
+        //$this->field = array_merge($this->field, $field);
+        $this->add($rules,$message,$field);
     }
 
     // 获取错误信息
@@ -216,8 +217,19 @@ class Validate extends Access {
         return new self($rules, $message, $field);
     }
 
-    public static function instance(array $rules = [], array $message = [], array $field = []) {
-        return new self($rules, $message, $field);
+    /**
+     * 追加规则等信息
+     *
+     * @param $rules
+     * @param $message
+     * @param $field
+     * @return $this
+     */
+    public function add($rules,$message,$field) {
+        $this->rule = array_merge($this->rule,$rules);
+        $this->message = array_merge($this->message, $message);
+        $this->field = array_merge($this->field, $field);
+        return $this;
     }
 
     /**
@@ -297,7 +309,10 @@ class Validate extends Access {
      * @param  string $name 场景名
      * @return $this
      */
-    public function scene($name) {
+    public function scene($name,$args=null) {
+        if($args) {
+            $this->scene[$name] = $args;
+        }
         // 设置当前场景
         $this->currentScene = $name;
 

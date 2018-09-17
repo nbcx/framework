@@ -12,18 +12,18 @@
 define('DS'        ,DIRECTORY_SEPARATOR);
 define('__NB__'    ,__DIR__.DS);
 define('__APP__'   ,_APP_.DS);
-define('__VER__'   ,'2.0');//版本号
+define('__VER__'   ,'2.0.1');//版本号
 define('__PHASE__' ,'alpha');//阶段
 
 $_ENV['argv'] = isset($argv)?$argv:'';
 spl_autoload_register(function($object) {
     $ex = explode('\\',$object);
     if($ex[0]=='nb') {
-        $path = str_replace($ex[0], __NB__.DS.'src', $object).'.php';
+        $path = str_replace($ex[0], __NB__.'src', $object).'.php';
         $path = str_replace('\\', '/', $path);
     }
     else{
-        $path = str_replace('\\', '/', $object).'.php';
+        $path = __APP__.str_replace('\\', '/', $object).'.php';
     }
     if(is_file($path)) {
         return require_once($path);

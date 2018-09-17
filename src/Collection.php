@@ -62,6 +62,15 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
         return !$this->isEmpty;
     }
 
+
+    /**
+     * 获取原始堆栈数据
+     * @return array
+     */
+    public function stack() {
+        return $this->stack;
+    }
+
     /**
      * 截取数组
      * stack
@@ -270,6 +279,7 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
         }
         return null;
     }
+
 
     /**
      * 验证堆栈值是否存在

@@ -13,6 +13,7 @@ use nb\Config;
 use nb\Pool;
 use nb\Request;
 use nb\Router;
+use nb\Validate;
 
 /**
  * Php
@@ -80,16 +81,16 @@ class Php extends Driver {
         }
     }
 
-    public function go($class, $function) {
+    public function go($controller, $function) {
         // TODO: Implement dowith() method.
-        $class = new \ReflectionClass($class);
+        $controller = new \ReflectionClass($controller);
 
         //创建当前控制器对象，并放入池子
-        $app = Pool::value('controller',$class->newInstance());
+        $app = Pool::value('controller',$controller->newInstance());
 
         //获取此次请求的参数
         $method = 'request';
-        if ($class->hasProperty('_method')) {
+        if ($controller->hasProperty('_method')) {
             $method = $app->_method;
         }
         $this->input = Request::driver()->form($method);
@@ -98,38 +99,48 @@ class Php extends Driver {
         $_before_argsn = [];
         $_function_argsn = [];
 
-        if ($_hasbefore = $class->hasMethod('__before')) {
+        if ($_hasbefore = $controller->hasMethod('__before')) {
             $_before = new \ReflectionMethod($app, '__before');
             $_before_argsn = $_before->getNumberOfParameters();
             if($_before_argsn>0) {
                 $args =  $_before->getParameters();
-                $this->verification($args,$pubparams,$scene, $class, $app);
+                $this->verification($args,$pubparams,$scene, $controller, $app);
             }
         }
 
-        if ($_hasfunction = $class->hasMethod($function)) {
+        if ($_hasfunction = $controller->hasMethod($function)) {
             $_function = new \ReflectionMethod($app, $function);
             $_function_argsn = $_function->getNumberOfParameters();
             if($_function_argsn>0) {
                 $args =  $_function->getParameters();
-                $this->verification($args,$this->params,$scene, $class, $app);
+                $this->verification($args,$this->params,$scene, $controller, $app);
             }
         }
 
         $scene = array_unique($scene);
         $param = array_unique(array_merge($pubparams,$this->params));
-
-        $validate = null;
-        $rule = $class->hasProperty('_rule');
-        if($rule && $app->_rule ) {
-            $validate = $class->hasProperty('_message')?Validate::make($app->_rule,$app->_message):Validate::make($app->_rule);
+        /*
+        $validate = Validate::class;
+        if($controller->hasProperty('_validate')) {
+            $validate = $app->_validate;
         }
+        $rule = $controller->hasProperty('_rule');
+        if($rule && $app->_rule) {
+            $validate = $controller->hasProperty('_message')?Validate::make($app->_rule,$app->_message):Validate::make($app->_rule);
+        }
+        */
+
+
+        $validate = $this->validate($controller,$app);
+
+        //将控制器专属的验证器放入对象池
+        Pool::set(Validate::class,$validate);
 
         if($validate && ($_before_argsn || $_function_argsn) ) {
-            $validate->scene($function, $scene);
-            $result = $validate->scene($function)->check($param);
+            //$validate->scene($function, $scene);
+            $result = $validate->scene($function, $scene)->check($param);
             if(!$result) {
-                if ($class->hasMethod('__error')) {
+                if ($controller->hasMethod('__error')) {
                     return $app->__error($validate->error,$validate->field);
                 }
                 return Pool::object('nb\\event\\Framework')->validate(
@@ -158,7 +169,7 @@ class Php extends Driver {
         }
 
         //判断用户是否构建了__after方法,如果构建，则执行
-        if ($class->hasMethod('__after')) {
+        if ($controller->hasMethod('__after')) {
             $app->__after($return);
         }
     }
@@ -170,10 +181,35 @@ class Php extends Driver {
     protected function debug(\nb\router\Driver &$url) {
         if (Config::$o->debug) {
             \nb\Debug::driver()->index();
-            //$bug = new Debug();
-            return;// $bug->index();
+            return;
         }
         Pool::object('nb\\event\\Framework')->notfound($url);
+    }
+
+    /**
+     * 创建验证器对象
+     * @return Validate
+     */
+    private function validate($controller,$app) {
+        $rule = [];
+        if($controller->hasProperty('_rule')) {
+            $rule = $app->_rule;
+        }
+
+        $validate = null;
+        if($controller->hasProperty('_validate')) {
+            $validate = $app->_validate;
+        }
+        else {
+            $rule and $validate = Validate::class;
+        }
+
+        if($validate) {
+            $message = $controller->hasProperty('_message')?$app->_message:[];
+            $validate = new $validate($rule,$message);
+        }
+
+        return $validate;
     }
 
     /**

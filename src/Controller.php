@@ -19,21 +19,16 @@ use nb\view\Driver;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2018/7/25
+ *
+ * @property  View view
  */
 class Controller {
 
-    public $_rule;
-    public $_message;
-    public $_method='request';
-
     /**
-     * @var Driver
+     * 获取表单参数的类型，request|post|get等等
+     * @var string
      */
-    protected $view;
-
-    public function __construct($config=[]) {
-        $this->view = View::ins();//new Template($config);
-    }
+    public $_method='request';
 
     protected function assign($name, $value = ''){
         $this->view->assign($name,$value);
@@ -42,28 +37,6 @@ class Controller {
 
     protected function display($template='', $vars = [], $config = []) {
         $this->view->display($template, $vars, $config);
-    }
-
-    /**
-     * 对给定字段进行验证,并返回给定字段
-     * @param $scene
-     * @param string $data
-     * @return bool
-     */
-    protected function validate($filed,callable $func=null){
-        $data = Request::driver()->form($this->_method);
-        $validate = Validate::make($this->_rule,$this->_msg);
-        if($filed) {
-            $filed = is_array($filed)?$filed:explode(',',$filed);
-            $validate->scene('_controller_', $filed);
-            $validate->scene('_controller_');
-        }
-        $result = $validate->check($data);
-        if($result) {
-            return $data;
-        }
-        $func = $func?:[$this,'__error'];
-        return call_user_func($func,$validate->getError(),$validate->getFiled());
     }
 
     /**
@@ -99,17 +72,19 @@ class Controller {
         }
 
         //$this->form('get','name','pass');
-
         $method === null and $method = $this->_method;
 
         $form = Request::form($method,$args);
 
-        $va = Validate::instance();
-        $va->scene('_form_', $args);
-        if($va->scene('_form_')->check($form)) {
+        $va = Pool::get(Validate::class);
+        if(!$va) {
             return $form;
         }
-        return $this->__error($va->getError(), $va->getFiled());
+
+        if($va->scene('_form_',$args)->check($form)) {
+            return $form;
+        }
+        return $this->__error($va->error, $va->field);
     }
 
     /**
@@ -179,7 +154,7 @@ class Controller {
 
         //$this->middle(false);
         if ($condition == false) {
-            return Obj::ins();
+            return new \StdClass();
         }
 
         //创建中间件对象
@@ -210,14 +185,16 @@ class Controller {
 
     public function __get($name) {
         switch($name) {
+            case 'view':
+                return View::driver();
             case 'isPost':
-                return Request::ins()->isPost;
+                return Request::driver()->isPost;
             case 'isGet':
-                return Request::ins()->isGet;
+                return Request::driver()->isGet;
             case 'isAjax':
-                return Request::ins()->isAjax;
+                return Request::driver()->isAjax;
             default:
-                $method = '___' . $name;
+                $method = '_' . $name;
                 if (method_exists($this, $method)) {
                     return  $this->$method();
                 }

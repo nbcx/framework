@@ -30,6 +30,11 @@ class Redis extends Driver {
     ];
 
     /**
+     * @var \Redis
+     */
+    protected $handler;
+
+    /**
      * 构造函数
      * @param array $options 缓存参数
      * @access public
@@ -61,7 +66,8 @@ class Redis extends Driver {
      * @return bool
      */
     public function has($name) {
-        return $this->handler->get($this->getCacheKey($name)) ? true : false;
+        return $this->handler->exists($name);
+        //return $this->handler->get($this->getCacheKey($name)) ? true : false;
     }
 
     /**
@@ -72,12 +78,12 @@ class Redis extends Driver {
      * @return mixed
      */
     public function get($name, $default = false) {
-        $value = $this->handler->get($this->getCacheKey($name));
+        $value = $this->handler->get($name);
         if (is_null($value)) {
             return $default;
         }
         $jsonData = json_decode($value, true);
-        // 检测是否为JSON数据 true 返回JSON解析数组, false返回源数据 byron sampson<xiaobo.sun@qq.com>
+        // 检测是否为JSON数据 true 返回JSON解析数组, false返回源数据
         return (null === $jsonData) ? $value : $jsonData;
     }
 
@@ -96,16 +102,16 @@ class Redis extends Driver {
         if ($this->tag && !$this->has($name)) {
             $first = true;
         }
-        $key = $this->getCacheKey($name);
-        //对数组/对象数据进行缓存处理，保证数据完整性  byron sampson<xiaobo.sun@qq.com>
+        //$key = $name;
+        //对数组/对象数据进行缓存处理，保证数据完整性
         $value = (is_object($value) || is_array($value)) ? json_encode($value) : $value;
         if (is_int($expire) && $expire) {
-            $result = $this->handler->setex($key, $expire, $value);
+            $result = $this->handler->setex($name, $expire, $value);
         }
         else {
-            $result = $this->handler->set($key, $value);
+            $result = $this->handler->set($name, $value);
         }
-        isset($first) && $this->setTagItem($key);
+        isset($first) && $this->setTagItem($name);
         return $result;
     }
 
@@ -140,7 +146,7 @@ class Redis extends Driver {
      * @return boolean
      */
     public function rm($name) {
-        return $this->handler->delete($this->getCacheKey($name));
+        return $this->handler->delete($name);
     }
 
     /**
@@ -162,4 +168,7 @@ class Redis extends Driver {
         return $this->handler->flushDB();
     }
 
+    public function update($name, array $value, $expire = null) {
+
+    }
 }

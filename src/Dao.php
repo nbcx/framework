@@ -43,14 +43,15 @@ class Dao extends Component {
         // TODO: Implement config() method.
         if(is_string($name)) {
             $ser = Config::getx($name);
-            $ser or $ser = conf($name);
+
+            $ser or $ser = Config::get($name);//conf($name);
             $name = $ser;
         }
         return $name;
     }
 
     public function __construct($table=null,$pk='id',$config = 'dao') {
-        $config = is_array($config)?:static::config($config);
+        $config = is_array($config)?$config:static::config($config);
 
         $this->driver = static::create($table,$pk,$config);
     }
@@ -68,7 +69,13 @@ class Dao extends Component {
             $class = explode('\\',$class);
             $table = end($class);
         }
+
+        if(!$config) {
+            throw new \Exception('dao config not exists!');
+        }
+
         $class = static::parse(get_class(),$config);
+
         return new $class($table,$pk,$config);
     }
 
@@ -264,11 +271,9 @@ class Dao extends Component {
 	 * @param number $fetchMode
 	 */
 	public function fetchs($condition = NULL, $params = NULL, $fields=null, $order='',$fetchMode=PDO::FETCH_ASSOC) {
-		return $this->driver
-            ->field($fields)
-            ->where($condition, $params)
-            ->orderby($order)
-            ->fetchAll($fetchMode);
+		 $this->driver->field($fields)->where($condition, $params);
+         $order and $this->orderby($order);
+         return  $this->fetchAll($fetchMode);
 	}
 
 

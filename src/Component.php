@@ -49,8 +49,8 @@ abstract class Component {
      * @return driver
      */
     public static function driver(){
-        $alias = get_called_class();
-        if($driver = Pool::get($alias)) {
+        $key = get_called_class();
+        if($driver = Pool::get($key)) {
             return $driver;
         }
 
@@ -62,18 +62,7 @@ abstract class Component {
             $args
         );
 
-        return Pool::set($alias,$class);
-        /*
-        if(func_num_args()>0) {
-            $args[] = $config;
-        }
-        else {
-            $args =  $config?[$config]:[];
-        }
-        $class = self::parse($alias,$config);
-
-        return Pool::object($alias,$class,$args);
-        */
+        return Pool::set($key,$class);
     }
 
     public static function replace() {
@@ -87,9 +76,11 @@ abstract class Component {
      * @throws \ReflectionException
      */
     protected static function parse($class,$config) {
-        $class = strtolower($class);
+        //检查是否有指定包名，如没有，使用子类全称为包名
+        $class = isset($config['namespace'])?$config['namespace']:strtolower($class);
         if(isset($config['driver']) && $config['driver']) {
-            if(strpos('/',$config['driver'])) {
+
+            if(strpos($config['driver'], '\\') !== false) {
                 $class = $config['driver'];
             }
             else {
@@ -157,6 +148,11 @@ abstract class Component {
     public function __get($name) {
         // TODO: Implement __get() method.
         return $this->driver->$name;
+    }
+
+    //驱动包名
+    protected static function __namespace() {
+        return get_called_class();
     }
 
 }
