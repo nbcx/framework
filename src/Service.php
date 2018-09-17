@@ -35,6 +35,9 @@ class Service {
 
     protected $controller;
 
+    //默认回调成功还是失败
+    protected $defaultCall = 'success';
+
     public function __construct(Controller $controller) {
         $this->controller = $controller;
     }
@@ -128,7 +131,7 @@ class Service {
 
         is_array($params) or $params = [$params];
 
-        $that->on('success',$callback);
+        $that->on($that->defaultCall,$callback);
 
         return $that->with($function,$params);
     }
@@ -149,7 +152,7 @@ class Service {
             $function = Router::driver()->function;
         }
 
-        $that->on('success',$callback);
+        $that->on($that->defaultCall,$callback);
 
         return $that->with($function);
     }
