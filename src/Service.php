@@ -114,7 +114,7 @@ class Service {
         if($this->status && isset($this->on['success'])) {
             call_user_func($this->on['success'],$this->success);
         }
-        else if(isset($that->on['fail'])) {
+        else if(isset($this->on['fail'])) {
             call_user_func($this->on['fail'],$this->fail);
         }
         return $this;
