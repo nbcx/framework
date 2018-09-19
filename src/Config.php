@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 namespace nb;
-define('__VER__'   ,'2.0.1');//版本号
+define('__VER__'   ,'2.0.2');//版本号
 define('__PHASE__' ,'alpha');//阶段
 /**
  * 框架配置类
