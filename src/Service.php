@@ -103,19 +103,16 @@ class Service {
         if ($condition == false) {
             return false;
         }
-
         return call_user_func_array([get_called_class(),'withRun'],$params);
     }
 
-
     protected function with($function,$params=[]) {
         $this->status = call_user_func_array([$this,$function],$params);
-
-        if($this->status && isset($this->on['success'])) {
-            call_user_func($this->on['success'],$this->success);
+        if($this->status) {
+            isset($this->on['success']) and call_user_func($this->on['success'],$this->success);
         }
-        else if(isset($this->on['fail'])) {
-            call_user_func($this->on['fail'],$this->fail);
+        else {
+            isset($this->on['fail']) and call_user_func($this->on['fail'],$this->fail);
         }
         return $this;
     }
