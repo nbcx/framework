@@ -24,12 +24,14 @@ class Service {
 
     //业务执行状态码
     public $code = 0;
+    public $msg;
+    public $data;
 
     //业务成功信息
-    public $success;
+    //public $success;
 
     //业务失败数据
-    public $fail;
+    //public $fail;
 
     protected $on = [];
 
@@ -109,10 +111,10 @@ class Service {
     protected function with($function,$params=[]) {
         $this->status = call_user_func_array([$this,$function],$params);
         if($this->status) {
-            isset($this->on['success']) and call_user_func($this->on['success'],$this->success);
+            isset($this->on['success']) and call_user_func($this->on['success'],$this);
         }
         else {
-            isset($this->on['fail']) and call_user_func($this->on['fail'],$this->fail);
+            isset($this->on['fail']) and call_user_func($this->on['fail'],$this);
         }
         return $this;
     }
@@ -170,7 +172,7 @@ class Service {
      */
     public function success($callback) {
         if($this->status) {
-            return $callback($this->success);
+            return $callback($this);
         }
         return $this;
     }
@@ -181,7 +183,7 @@ class Service {
      */
     public function fail($callback) {
         if($this->status == false) {
-            return $callback($this->fail);//call_user_func_array($callback,);//
+            return $callback($this);//call_user_func_array($callback,);//
         }
         return $this;
     }
