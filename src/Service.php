@@ -111,10 +111,10 @@ class Service {
     protected function with($function,$params=[]) {
         $this->status = call_user_func_array([$this,$function],$params);
         if($this->status) {
-            isset($this->on['success']) and call_user_func($this->on['success'],$this);
+            isset($this->on['success']) and call_user_func($this->on['success'],$this->msg,$this->data,$this->code);
         }
         else {
-            isset($this->on['fail']) and call_user_func($this->on['fail'],$this);
+            isset($this->on['fail']) and call_user_func($this->on['fail'],$this->msg,$this->code,$this->data);
         }
         return $this;
     }
