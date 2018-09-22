@@ -1074,11 +1074,18 @@ abstract class Driver extends Access {
     }
 
     protected function _data($data) {
+        if($this->object) {
+            $object = $this->object;
+            return new $object(is_array($data)?$data:[]);
+        }
+        return $data;
+        /*
         if($data && is_array($data) && $this->object) {
             $object = $this->object;
             return new $object($data);
         }
         return $data;
+        */
     }
 
     /**
