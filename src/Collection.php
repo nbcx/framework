@@ -50,7 +50,7 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
      * 是否为空
      * @return bool
      */
-    public function _isEmpty() {
+    public function _empty() {
         return empty($this->stack);
     }
 
@@ -58,8 +58,8 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
      * 是否不为空
      * @return bool
      */
-    public function _isHave() {
-        return !$this->isEmpty;
+    public function _have() {
+        return !$this->empty;
     }
 
 
