@@ -38,7 +38,7 @@ class Service {
     protected $controller;
 
     //默认回调成功还是失败
-    protected $defaultCall = 'success';
+    protected $defaultCall = 'fail';
 
     public function __construct(Controller $controller) {
         $this->controller = $controller;
