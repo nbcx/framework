@@ -24,6 +24,11 @@ class Memcached extends Driver {
     ];
 
     /**
+     * @var \Memcached
+     */
+    protected $handler;
+
+    /**
      * 构造函数
      * @param array $options 缓存参数
      * @access public
@@ -68,8 +73,7 @@ class Memcached extends Driver {
      * @return bool
      */
     public function has($name) {
-        $key = $this->getCacheKey($name);
-        return $this->handler->get($key) ? true : false;
+        return $this->handler->get($name) ? true : false;
     }
 
     /**
@@ -80,7 +84,7 @@ class Memcached extends Driver {
      * @return mixed
      */
     public function get($name, $default = false) {
-        $result = $this->handler->get($this->getCacheKey($name));
+        $result = $this->handler->get($name);
         return false !== $result ? $result : $default;
     }
 
@@ -96,13 +100,13 @@ class Memcached extends Driver {
         if (is_null($expire)) {
             $expire = $this->options['expire'];
         }
-        if ($this->tag && !$this->has($name)) {
-            $first = true;
-        }
-        $key = $this->getCacheKey($name);
+        //if ($this->tag && !$this->has($name)) {
+        //    $first = true;
+        //}
+        //$key = $this->getCacheKey($name);
         $expire = 0 == $expire ? 0 : $_SERVER['REQUEST_TIME'] + $expire;
-        if ($this->handler->set($key, $value, $expire)) {
-            isset($first) && $this->setTagItem($key);
+        if ($this->handler->set($name, $value, $expire)) {
+            //isset($first) && $this->setTagItem($name);
             return true;
         }
         return false;
@@ -116,11 +120,10 @@ class Memcached extends Driver {
      * @return false|int
      */
     public function inc($name, $step = 1) {
-        $key = $this->getCacheKey($name);
-        if ($this->handler->get($key)) {
-            return $this->handler->increment($key, $step);
+        if ($this->handler->get($name)) {
+            return $this->handler->increment($name, $step);
         }
-        return $this->handler->set($key, $step);
+        return $this->handler->set($name, $step);
     }
 
     /**
@@ -131,9 +134,8 @@ class Memcached extends Driver {
      * @return false|int
      */
     public function dec($name, $step = 1) {
-        $key = $this->getCacheKey($name);
-        $value = $this->handler->get($key) - $step;
-        $res = $this->handler->set($key, $value);
+        $value = $this->handler->get($name) - $step;
+        $res = $this->handler->set($name, $value);
         if (!$res) {
             return false;
         }
@@ -144,30 +146,31 @@ class Memcached extends Driver {
 
     /**
      * 删除缓存
-     * @param    string $name 缓存变量名
+     * @param string $name 缓存变量名
      * @param bool|false $ttl
      * @return bool
      */
     public function rm($name, $ttl = false) {
-        $key = $this->getCacheKey($name);
         return false === $ttl ?
-            $this->handler->delete($key) :
-            $this->handler->delete($key, $ttl);
+            $this->handler->delete($name) :
+            $this->handler->delete($name, $ttl);
     }
 
     /**
      * 清除缓存
      * @access public
-     * @param string $tag 标签名
+     * @param string $pattern 匹配符
      * @return bool
+     *
+     * Memcache 暂不支持模糊删除，批量删除，可以传入一个数组key
      */
-    public function clear($tag = null) {
-        if ($tag) {
+    public function clear($pattern = null) {
+        if ($pattern) {
             // 指定标签清除
-            $keys = $this->getTagItem($tag);
-            $this->handler->deleteMulti($keys);
-            $this->rm('tag_' . md5($tag));
-            return true;
+            //$keys = $this->getTagItem($tag);
+            $flag = is_array($pattern) && $this->handler->deleteMulti($pattern);
+            //$this->rm('tag_' . md5($tag));
+            return $flag;
         }
         return $this->handler->flush();
     }

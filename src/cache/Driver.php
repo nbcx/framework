@@ -45,16 +45,7 @@ abstract class Driver {
      * @param int $expire 有效时间 0为永久
      * @return boolean
      */
-    abstract public function set($name, $expire, $value);
-
-    /**
-     * 修改缓存里的某一些值
-     * @param $name
-     * @param array $value
-     * @param null $expire
-     * @return mixed
-     */
-    abstract public function update($name, array $value, $expire = null);
+    abstract public function set($name, $value, $expire);
 
     /**
      * 自增缓存（针对数值缓存）
@@ -85,10 +76,10 @@ abstract class Driver {
     /**
      * 清除缓存
      * @access public
-     * @param string $tag 标签名
+     * @param string $pattern 匹配符
      * @return boolean
      */
-    abstract public function clear($tag = null);
+    abstract public function clear($pattern = null);
 
     /**
      * 读取缓存并删除
@@ -105,6 +96,21 @@ abstract class Driver {
         else {
             return;
         }
+    }
+
+    /**
+     * 修改缓存里的某一些值
+     * @param $name
+     * @param array $value
+     * @param null $expire
+     * @return mixed
+     */
+    public function update($name, array $value, $expire = null) {
+        $result = $this->get($name);
+        if(is_array($result)) {
+            return $this->set($name,array_merge($result,$value),$expire);
+        }
+        return $this->set($name,$value,$expire);
     }
 
 }

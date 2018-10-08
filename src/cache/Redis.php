@@ -9,7 +9,6 @@
  */
 namespace nb\cache;
 
-
 /**
  * Redis缓存驱动，适合单机部署、有前端代理实现高可用的场景，性能最好
  * 有需要在业务层实现读写分离、或者使用RedisCluster的需求，请使用Redisd驱动
@@ -67,7 +66,6 @@ class Redis extends Driver {
      */
     public function has($name) {
         return $this->handler->exists($name);
-        //return $this->handler->get($this->getCacheKey($name)) ? true : false;
     }
 
     /**
@@ -99,9 +97,6 @@ class Redis extends Driver {
         if (is_null($expire)) {
             $expire = $this->options['expire'];
         }
-        if ($this->tag && !$this->has($name)) {
-            $first = true;
-        }
         //$key = $name;
         //对数组/对象数据进行缓存处理，保证数据完整性
         $value = (is_object($value) || is_array($value)) ? json_encode($value) : $value;
@@ -111,7 +106,6 @@ class Redis extends Driver {
         else {
             $result = $this->handler->set($name, $value);
         }
-        isset($first) && $this->setTagItem($name);
         return $result;
     }
 
@@ -123,8 +117,7 @@ class Redis extends Driver {
      * @return false|int
      */
     public function inc($name, $step = 1) {
-        $key = $this->getCacheKey($name);
-        return $this->handler->incrby($key, $step);
+        return $this->handler->incrby($name, $step);
     }
 
     /**
@@ -135,8 +128,7 @@ class Redis extends Driver {
      * @return false|int
      */
     public function dec($name, $step = 1) {
-        $key = $this->getCacheKey($name);
-        return $this->handler->decrby($key, $step);
+        return $this->handler->decrby($name, $step);
     }
 
     /**
@@ -152,23 +144,15 @@ class Redis extends Driver {
     /**
      * 清除缓存
      * @access public
-     * @param string $tag 标签名
+     * @param string $pattern 匹配符
      * @return boolean
      */
-    public function clear($tag = null) {
-        if ($tag) {
-            // 指定标签清除
-            $keys = $this->getTagItem($tag);
-            foreach ($keys as $key) {
-                $this->handler->delete($key);
-            }
-            $this->rm('tag_' . md5($tag));
+    public function clear($pattern = null) {
+        if ($pattern) {
+            $this->rm($this->handler->keys($pattern));
             return true;
         }
         return $this->handler->flushDB();
     }
 
-    public function update($name, array $value, $expire = null) {
-
-    }
 }
