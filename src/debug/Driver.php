@@ -10,6 +10,7 @@
 namespace nb\debug;
 
 use nb\Config;
+use nb\Debug;
 
 /**
  * Driver
@@ -21,6 +22,8 @@ use nb\Config;
  * @date: 2017/12/3
  */
 abstract class Driver {
+
+    protected $record;
 
 	/**
 	 * @return Debug
