@@ -204,4 +204,21 @@ class Debug extends Component {
     }
 
 
+    /**
+     * 优化调试变量显示
+     * @param $var
+     */
+    public static function optimize($var) {
+        if(!$var) {
+            self::e($var);
+        }
+        else {
+            if(is_string($var)){
+                echo $var;
+            }
+            else {
+                self::ex($var);
+            }
+        }
+    }
 }

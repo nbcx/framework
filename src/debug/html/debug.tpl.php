@@ -66,8 +66,8 @@
                     <table>
                         <?php foreach ($val['log'] as $k=>$v ){ ?>
                             <tr>
-                                <td style="cursor: pointer;" valign="top" onclick="show('log-<?=$key?>-<?=$k?>')"><?=is_array($v['k'])?\nb\exception\assist\Stack::debug_array($v['k']):$v['k'] ?></td>
-                                <td class="breakall" id="log-<?=$key?>-<?=$k?>"><?=is_string($v['v'])?$v['v']:\nb\Debug::e($v['v']) ?></td>
+                                <td style="cursor: pointer;" valign="top" onclick="show('log-<?=$key?>-<?=$k?>')"><?=\nb\Debug::optimize($v['k']) ?></td>
+                                <td class="breakall" id="log-<?=$key?>-<?=$k?>"><?=\nb\Debug::optimize($v['v']) ?></td>
                             </tr>
                         <?php }?>
                     </table>
@@ -90,7 +90,7 @@
                 <div id="post-<?=$key?>">
                     <table>
                         <?php foreach ($val['post'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):htmlspecialchars($v) ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::optimize($v):htmlspecialchars($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -101,7 +101,7 @@
                 <div id="get-<?=$key?>">
                     <table>
                         <?php foreach ($val['file'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):htmlspecialchars($v) ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::optimize($v):htmlspecialchars($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -146,7 +146,7 @@
                 <div id="session-<?=$key?>" style="display: none">
                     <table>
                         <?php foreach ($val['session'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?e($v):$v ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=\nb\Debug::optimize($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -157,7 +157,7 @@
                 <div id="server-<?=$key?>" style="display: none">
                     <table>
                         <?php foreach ($val['server'] as $k => $v ){ ?>
-                            <tr ><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):$v ?></td></tr>
+                            <tr ><td><?=$k ?></td><td class="breakall"><?=\nb\Debug::optimize($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -168,7 +168,7 @@
                 <div id="cookie-<?=$key?>">
                     <table>
                         <?php foreach ($val['cookie'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):$v ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=\nb\Debug::optimize($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
