@@ -86,30 +86,6 @@ class Command extends Driver {
 
 
 	/**
-	 *
-	 * @param $type
-	 * @param $key
-	 * @param $val
-	 */
-	public function record($type,$parama,$paramb=null){
-        switch($type) {
-            case 1:
-                if(is_object($paramb)) {
-                    $paramb = print_r($paramb,true);
-                }
-                $this->record['log'][] = ['k'=>$parama,'v'=>$paramb];
-                break;
-            case 2:
-                $parama = Debug::e2Array($parama);
-                $this->record['e'][] = $parama;
-                break;
-            case 3:
-                $this->record['sql'][] = ['sql'=>$parama,'param'=>$paramb];
-                break;
-        }
-	}
-
-	/**
 	 * 统计信息，存入Bug
 	 */
 	public function end(){

@@ -27,13 +27,29 @@ abstract class Driver {
 	 */
 	abstract public function start($synchronous = true);
 
-	/**
-	 *
-	 * @param $type
-	 * @param $key
-	 * @param $val
-	 */
-    abstract public function record($type,$parama,$paramb=null);
+    /**
+     *
+     * @param $type
+     * @param $key
+     * @param $val
+     */
+    public function record($type,$parama,$paramb=null){
+        switch($type) {
+            case 1:
+                if(is_object($paramb)) {
+                    $paramb = '<pre>'.print_r($paramb,true).'<pre/>';
+                }
+                $this->record['log'][] = ['k'=>$parama,'v'=>$paramb];
+                break;
+            case 2:
+                $parama = Debug::e2Array($parama);
+                $this->record['e'][] = $parama;
+                break;
+            case 3:
+                $this->record['sql'][] = ['sql'=>$parama,'param'=>$paramb];
+                break;
+        }
+    }
 
 	/**
 	 * 统计信息，存入Bug
