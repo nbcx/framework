@@ -31,8 +31,6 @@ class Command extends Driver {
 	private $n = 10;
 	private $page = false;
 
-	private $record;
-
 	private $startd = false;
 
     public function __construct() {
