@@ -79,7 +79,7 @@
                 <div id="get-<?=$key?>">
                     <table>
                         <?php foreach ($val['get'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?e($v):htmlspecialchars($v) ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):htmlspecialchars($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -90,7 +90,7 @@
                 <div id="post-<?=$key?>">
                     <table>
                         <?php foreach ($val['post'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?e($v):htmlspecialchars($v) ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):htmlspecialchars($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -101,7 +101,7 @@
                 <div id="get-<?=$key?>">
                     <table>
                         <?php foreach ($val['file'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?e($v):htmlspecialchars($v) ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):htmlspecialchars($v) ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -157,7 +157,7 @@
                 <div id="server-<?=$key?>" style="display: none">
                     <table>
                         <?php foreach ($val['server'] as $k => $v ){ ?>
-                            <tr ><td><?=$k ?></td><td class="breakall"><?=is_array($v)?e($v):$v ?></td></tr>
+                            <tr ><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):$v ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
@@ -168,7 +168,7 @@
                 <div id="cookie-<?=$key?>">
                     <table>
                         <?php foreach ($val['cookie'] as $k => $v ){ ?>
-                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?e($v):$v ?></td></tr>
+                            <tr><td><?=$k ?></td><td class="breakall"><?=is_array($v)?\nb\Debug::e($v):$v ?></td></tr>
                         <?php }?>
                     </table>
                 </div>
