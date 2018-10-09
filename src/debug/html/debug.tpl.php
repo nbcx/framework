@@ -67,7 +67,7 @@
                         <?php foreach ($val['log'] as $k=>$v ){ ?>
                             <tr>
                                 <td style="cursor: pointer;" valign="top" onclick="show('log-<?=$key?>-<?=$k?>')"><?=is_array($v['k'])?\nb\exception\assist\Stack::debug_array($v['k']):$v['k'] ?></td>
-                                <td class="breakall" id="log-<?=$key?>-<?=$k?>"><?=is_array($v['v'])?\nb\exception\assist\Stack::debug_array($v['v']):\nb\Debug::ee($v['v']) ?></td>
+                                <td class="breakall" id="log-<?=$key?>-<?=$k?>"><?=is_array($v['v'])?\nb\exception\assist\Stack::debug_array($v['v']):\nb\Debug::e($v['v']) ?></td>
                             </tr>
                         <?php }?>
                     </table>
