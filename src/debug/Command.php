@@ -94,6 +94,9 @@ class Command extends Driver {
 	public function record($type,$parama,$paramb=null){
         switch($type) {
             case 1:
+                if(is_object($paramb)) {
+                    $paramb = print_r($paramb,true);
+                }
                 $this->record['log'][] = ['k'=>$parama,'v'=>$paramb];
                 break;
             case 2:
