@@ -127,6 +127,9 @@ class Debug extends Component {
      */
     public static function ex($var, $detailed = false, $label = null, $flags = ENT_SUBSTITUTE) {
         if(!Config::$o->debug) return;
+
+        self::driver()->ex($var, $detailed, $label, $flags);
+        /*
         $label = (null === $label) ? '' : rtrim($label) . ':';
 
         if (is_object($var)) { //$var instanceof \nb\Collection
@@ -147,6 +150,7 @@ class Debug extends Component {
             $output = '<pre>' . $label . $output . '</pre>';
         }
         echo $output;
+        */
     }
 
     /**

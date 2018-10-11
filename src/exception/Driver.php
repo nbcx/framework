@@ -63,4 +63,6 @@ abstract class Driver {
      */
     abstract protected function show($e,$deadly = false);
 
+    abstract public function notfound();
+
 }

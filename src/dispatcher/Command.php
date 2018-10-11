@@ -91,6 +91,7 @@ class Command extends Driver  implements ICommand {
             return Pool::object('nb\\event\\Framework')->notfound();
         }
         $this->go($class,$router->function);
+
     }
 
     public function go($class, $function) {

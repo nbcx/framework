@@ -46,14 +46,14 @@ class Php extends Driver {
 
         //判断是否为模块绑定
         $module = Config::$o->module_bind;
-        if($module && isset($module[$host = Request::ins()->host])) {
+        if($module && isset($module[$host = Request::driver()->host])) {
             $this->module($module[$host]);
-            $router = Router::ins();
+            $router = Router::driver();
             $router->module = $module[$host];
             $router->mustAnalyse();
         }
         else {
-            $router = Router::ins()->mustAnalyse();
+            $router = Router::driver()->mustAnalyse();
             //如果访问的模块，加载模块配置
             if($router->module) {
                 $this->module($router->module);
@@ -119,17 +119,6 @@ class Php extends Driver {
 
         $scene = array_unique($scene);
         $param = array_unique(array_merge($pubparams,$this->params));
-        /*
-        $validate = Validate::class;
-        if($controller->hasProperty('_validate')) {
-            $validate = $app->_validate;
-        }
-        $rule = $controller->hasProperty('_rule');
-        if($rule && $app->_rule) {
-            $validate = $controller->hasProperty('_message')?Validate::make($app->_rule,$app->_message):Validate::make($app->_rule);
-        }
-        */
-
 
         $validate = $this->validate($controller,$app);
 

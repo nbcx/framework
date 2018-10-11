@@ -93,4 +93,28 @@ abstract class Driver {
         die($status);
     }
 
+
+    /**
+     * 对终端友好的变量输出
+     * @access public
+     * @param  mixed         $var 变量
+     * @param  boolean       $detailed 是否详细输出 默认为true 如果为false 则使用print_r输出
+     * @param  string        $label 标签 默认为空
+     * @param  integer       $flags htmlspecialchars flags
+     * @return void|string
+     */
+    public static function ex($var, $detailed = false, $label = null, $flags = ENT_SUBSTITUTE) {
+        $label = (null === $label) ? '' : rtrim($label) . ':';
+
+        if (is_object($var)) { //$var instanceof \nb\Collection
+            $detailed = false;
+        }
+        ob_start();
+        $detailed?var_dump($var):print_r($var);
+        $output = ob_get_clean();
+        $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
+        $output = '<pre>' . $label . $output . '</pre>';
+        echo $output;
+    }
+
 }

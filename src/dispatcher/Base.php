@@ -27,8 +27,6 @@ class Base extends Driver {
     protected $params = [];
 
     public function run($data=null){
-        //$frame = Pool::get('\swoole\websocket\Frame');
-        //$data = $frame->data;
 
         $action = Pool::object('\event\Framework')->parser($data);
 
@@ -79,7 +77,8 @@ class Base extends Driver {
                     Pool::object('nb\\event\\Framework')->notfound();
                     return;
                 }
-                $return = call_user_func_array([$app,$function],$this->params);
+                $return = is_array($this->params)?call_user_func_array([$app,$function],$this->params)
+                    :call_user_func([$app,$function],$this->params);
             }
             else {
                 return Pool::object('nb\\event\\Framework')->notfound();;

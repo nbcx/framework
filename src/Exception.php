@@ -30,11 +30,6 @@ class Exception extends Component {
     }
 
     public static function register() {
-        //$that = self::driver();
-        //register_shutdown_function([$that, 'shutdown']);
-        //set_exception_handler([$that, 'exception']);
-        //set_error_handler([$that, 'error']);
-
         register_shutdown_function('nb\Exception::shutdown');
         set_exception_handler('nb\Exception::exception');
         set_error_handler('nb\Exception::error');

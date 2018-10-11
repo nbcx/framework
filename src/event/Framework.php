@@ -10,6 +10,7 @@
 namespace nb\event;
 
 use nb\Config;
+use nb\Exception;
 use nb\I18n;
 use nb\Router;
 
@@ -39,34 +40,7 @@ class Framework {
      * @throws \Exception
      */
     public function notfound() {
-        $router = Router::driver();
-        if (Config::$o->sapi == 'cli') {
-            die('Cli Not Found:' .  $router->module. '/' .$router->controller . '/' . $router->function."\n");
-        }
-        if (isset($this->call['notfound']) && !call_user_func($this->call['notfound'], $router)) {
-            return;
-        }
-        if(ob_get_level() > 0) {
-            ob_clean();
-        }
-        //if (!headers_sent()) {
-        //    header('HTTP/1.1 404 Not Found');
-        //    header('Status:404 Not Found');
-        //}
-        //if (f('ajax')) {
-        //    Config::$o->debug and quit('Ajax Not Found:' . $router->getModel(). '/' . $router->getController() . '/' . $router->getFunction());
-        //    quit('404 page not found url!');
-        //}
-        if (Config::$o->debug) {
-            $hint = I18n::t('请求无法应答！');
-            $message = I18n::t('请检查下面路由信息是否正确！ %s%s%s%s',[
-                '<br/>module : '.$router->module,
-                '<br/>folder : '.$router->folder,
-                '<br/>controller : '.$router->controller,
-                '<br/>function : '.$router->function
-            ]);
-        }
-        include __DIR__ . DS . 'html' . DS . 'hint.tpl.php';
+        Exception::driver()->notfound();
     }
 
 
@@ -80,29 +54,6 @@ class Framework {
      */
     public function error($e,$deadly = false) {
         return true;
-        if (Config::$o->debug) {
-            if ($deadly) {
-                if (Config::$o->sapi=='cli') {
-                    echo "\n:( Have Error\n";
-                    echo "CODE: {$e->getCode()} \n";
-                    echo "FILE: {$e->getFile()} \n";
-                    echo "LINE: {$e->getLine()}\n";
-                    echo "DESC: {$e->getMessage()}\n\n";
-                }
-                else {
-                    echo "\n:( Swoole Error\n";
-                    echo "CODE: {$e->getCode()} \n";
-                    echo "FILE: {$e->getFile()} \n";
-                    echo "LINE: {$e->getLine()}\n";
-                    echo "DESC: {$e->getMessage()}\n\n";
-                    return;
-                    if(ob_get_level() > 0) {
-                        ob_clean();
-                    }
-                    include __NB__ . 'templet' . DS . 'exception.tbl.php';
-                }
-            }
-        }
     }
 
     /**

@@ -10,6 +10,9 @@
 namespace nb\server;
 
 use nb\Config;
+use nb\Debug;
+use nb\Dispatcher;
+use nb\Pool;
 use nb\server\assist\Swoole;
 
 /**
@@ -22,6 +25,8 @@ use nb\server\assist\Swoole;
  * @date: 2017/12/1
  */
 class Tcp extends Swoole {
+
+    public $fd;
 
     protected $options = [
         'driver'=>'tcp',
@@ -77,6 +82,7 @@ class Tcp extends Swoole {
 
 
     public function receive($server, $fd, $reactor_id, $data) {
+        $this->fd = $fd;
         try {
             Config::$o->sapi='tcp';
             ob_start();
@@ -87,7 +93,7 @@ class Tcp extends Swoole {
             $this->error($e);
         }
         Debug::end();
-        $server->push($fd,ob_get_contents());
+        $server->send($fd,ob_get_contents());
         ob_end_clean();
     }
 
