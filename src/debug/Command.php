@@ -133,18 +133,19 @@ class Command extends Driver {
      * @param  integer       $flags htmlspecialchars flags
      * @return void|string
      */
-    public static function ex($var, $detailed = false, $label = null, $flags = ENT_SUBSTITUTE) {
-        $label = (null === $label) ? '' : rtrim($label) . ':';
+    public static function ex($var, $detailed = false) {//, $label = null, $flags = ENT_SUBSTITUTE
+        //$label = (null === $label) ? '' : rtrim($label) . ':';
 
         if (is_object($var)) { //$var instanceof \nb\Collection
             $detailed = false;
         }
-        ob_start();
+        echo PHP_EOL;
+        //ob_start();
         $detailed?var_dump($var):print_r($var);
-        $output = ob_get_clean();
-        $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
-
-        echo PHP_EOL . $label . $output . PHP_EOL;
+        //$output = ob_get_clean();
+        //$output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
+        echo PHP_EOL;
+        //echo PHP_EOL . $label . $output . PHP_EOL;
     }
 
 }

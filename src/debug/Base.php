@@ -19,5 +19,19 @@ namespace nb\debug;
  */
 class Base extends Command {
 
+    //是否已经中断程序运行了
+    private $died = false;
 
+    /**
+     * 中断程序运行
+     * @param $status
+     */
+    public function quit($status) {
+        if($this->died) {
+            return;
+        }
+        $this->died = true;
+        if($status) echo $status;
+        throw new \Exception('die');
+    }
 }

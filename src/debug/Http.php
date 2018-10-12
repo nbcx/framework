@@ -110,13 +110,12 @@ class Http extends Php {
      * 中断程序运行
      * @param $status
      */
-	public function quit($status) {
-	    if($this->died) {
-	       return;
+    public function quit($status) {
+        if($this->died) {
+            return;
         }
         $this->died = true;
         if($status) echo $status;
         throw new \Exception('die');
     }
-
 }

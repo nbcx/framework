@@ -85,14 +85,6 @@ abstract class Driver {
         file_put_contents($bpath.'debug.log', json_encode($log));
     }
 
-    /**
-     * 中断程序运行
-     * @param $status
-     */
-    public function quit($status) {
-        die($status);
-    }
-
 
     /**
      * 对终端友好的变量输出
@@ -103,9 +95,7 @@ abstract class Driver {
      * @param  integer       $flags htmlspecialchars flags
      * @return void|string
      */
-    public static function ex($var, $detailed = false, $label = null, $flags = ENT_SUBSTITUTE) {
-        $label = (null === $label) ? '' : rtrim($label) . ':';
-
+    public static function ex($var, $detailed = false) {
         if (is_object($var)) { //$var instanceof \nb\Collection
             $detailed = false;
         }
@@ -113,8 +103,16 @@ abstract class Driver {
         $detailed?var_dump($var):print_r($var);
         $output = ob_get_clean();
         $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
-        $output = '<pre>' . $label . $output . '</pre>';
+        $output = '<pre>'  . $output . '</pre>';
         echo $output;
+    }
+
+    /**
+     * 中断程序运行
+     * @param $status
+     */
+    public function quit($status) {
+        die($status);
     }
 
 }

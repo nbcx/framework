@@ -174,4 +174,19 @@ class Memcached extends Driver {
         }
         return $this->handler->flush();
     }
+
+    public function __call($name, $arguments) {
+        // TODO: Implement __call() method.
+        return call_user_func_array([$this->handler,$name],$arguments);
+    }
+
+    public function __set($name, $value) {
+        // TODO: Implement __set() method.
+        return $this->handler->$name = $value;
+    }
+
+    public function __get($name) {
+        // TODO: Implement __get() method.
+        return $this->handler->$name;
+    }
 }

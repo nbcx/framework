@@ -13,7 +13,6 @@ use nb\Config;
 use nb\Debug;
 use nb\Dispatcher;
 use nb\Pool;
-use nb\server\assist\Swoole;
 
 /**
  * Websocket
@@ -23,8 +22,12 @@ use nb\server\assist\Swoole;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/1
+ *
+ * @property  \swoole\websocket\Server swoole
  */
 class Websocket extends Http {
+
+    public $fd;
 
     protected $options = [
         'driver'=>'websocket',
@@ -89,6 +92,7 @@ class Websocket extends Http {
             Config::$o->sapi='websocket';
             ob_start();
             Pool::destroy();
+            $this->fd = $frame->fd;
             Pool::set('\swoole\websocket\Frame', $frame);
             Dispatcher::run($frame->data);
         }
@@ -96,15 +100,35 @@ class Websocket extends Http {
             $this->error($e);
         }
         Debug::end();
-        $server->push($frame->fd,ob_get_contents());
+        $server->push($this->fd,ob_get_contents());
         ob_end_clean();
     }
 
     /**
      * @return \swoole\websocket\Frame
      */
-    public function _frame()     {
+    public function frame()     {
         return Pool::get('\swoole\websocket\Frame');
+    }
+
+    /**
+     * 向客户端发送数据，和Tcp保持一致的API
+     * @param int $fd
+     * @param string $data
+     * @return bool
+     */
+    public function send($fd, $data){
+        return $this->swoole->push($fd,$data);
+    }
+
+    /**
+     * 向当前连接客户端发送数据，和Tcp保持一致的API
+     * @param int $fd
+     * @param string $data
+     * @return bool
+     */
+    public function reply($data){
+        return $this->swoole->push($this->fd,$data);
     }
 
 }

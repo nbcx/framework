@@ -23,6 +23,8 @@ use nb\server\assist\Swoole;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/1
+ *
+ * @property  \swoole\Server swoole
  */
 class Tcp extends Swoole {
 
@@ -80,13 +82,12 @@ class Tcp extends Swoole {
         $server->start();
     }
 
-
     public function receive($server, $fd, $reactor_id, $data) {
-        $this->fd = $fd;
         try {
             Config::$o->sapi='tcp';
             ob_start();
             Pool::destroy();
+            $this->fd = $fd;
             Dispatcher::run($data);
         }
         catch (\Throwable $e) {
@@ -97,5 +98,36 @@ class Tcp extends Swoole {
         ob_end_clean();
     }
 
+    /**
+     * 向客户端发送数据 https://wiki.swoole.com/wiki/page/p-server/send.html
+     *
+     *  * $data，发送的数据。TCP协议最大不得超过2M，UDP协议不得超过64K
+     *  * 发送成功会返回true，如果连接已被关闭或发送失败会返回false
+     *
+     * TCP服务器
+     *  * send操作具有原子性，多个进程同时调用send向同一个连接发送数据，不会发生数据混杂
+     *  * 如果要发送超过2M的数据，可以将数据写入临时文件，然后通过sendfile接口进行发送
+     *
+     * UDP服务器
+     *  * send操作会直接在worker进程内发送数据包，不会再经过主进程转发
+     *  * 在外网服务中发送超过64K的数据会分成多个传输单元进行发送，如果其中一个单元丢包，会导致整个包被丢弃。所以外网服务，建议发送1.5K以下的数据包
+     *
+     * @param int $fd
+     * @param string $data
+     * @return bool
+     */
+    public function send($fd, $data){
+        return $this->swoole->send($fd,$data);
+    }
+
+    /**
+     * 向当前连接客户端发送数据
+     * @param int $fd
+     * @param string $data
+     * @return bool
+     */
+    public function reply($data){
+        return $this->swoole->send($this->fd,$data);
+    }
 
 }
