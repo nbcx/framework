@@ -211,7 +211,7 @@ class Php extends Driver {
      * @return string
      */
     public function _pathInfo() {
-        return Request::ins()->pathinfo;
+        return Request::driver()->pathinfo;
     }
 
     /**

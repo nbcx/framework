@@ -94,7 +94,7 @@ class Websocket extends Http {
             Pool::destroy();
             $this->fd = $frame->fd;
             Pool::set('\swoole\websocket\Frame', $frame);
-            Dispatcher::run($frame->data);
+            Dispatcher::run();//$frame->data
         }
         catch (\Throwable $e) {
             $this->error($e);
@@ -129,6 +129,19 @@ class Websocket extends Http {
      */
     public function reply($data){
         return $this->swoole->push($this->fd,$data);
+    }
+
+    /**
+     * 主动向websocket客户端发送关闭帧并关闭该连接
+     *
+     * @param int $fd 客户端连接的ID，如果指定的$fd对应的TCP连接并非websocket客户端，将会发送失败
+     * @param int $code 关闭连接的状态码，根据RFC6455，对于应用程序关闭连接状态码，取值范围为1000或4000-4999之间
+     * @param string $reason 关闭连接的原因，utf-8格式字符串，字节长度不超过125
+     * @return mixed 发送成功返回true，发送失败或状态码非法时返回false
+     */
+    public function close($fd=0, $code = 1000, $reason = "") {
+        $fd or $fd = $this->fd;
+        return $this->swoole->disconnect($fd,$code,$reason);
     }
 
 }

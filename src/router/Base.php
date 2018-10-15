@@ -11,6 +11,7 @@ namespace nb\router;
 
 use nb\Config;
 use nb\Pool;
+use nb\Request;
 
 /**
  * Command
@@ -31,11 +32,7 @@ class Base extends Driver {
     public $current;
 
     public function _pathinfo() {
-        $url = Config::$o->argv;
-        if(isset($url[1])) {
-            return $url[1];
-        }
-        return '';
+        return Request::driver()->pathinfo;
     }
 
     /**

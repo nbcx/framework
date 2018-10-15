@@ -120,7 +120,7 @@ function dao($tableName=null,$id='id',$server = 'dao') {
  * @param String $tbl 要显示的模板
  */
 function view($tbl, $ex = 'php') {
-    $module = \nb\Router::ins()->module;
+    $module = \nb\Router::driver()->module;
     if($module) {
         $path = __APP__.'module'.DS.$module.DS;
     }

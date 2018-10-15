@@ -320,7 +320,6 @@ class Php extends Driver {
             $pathInfo = '/';
         }
 
-        // fix issue 456
         return '/' . ltrim(urldecode($pathInfo), '/');
     }
 

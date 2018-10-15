@@ -9,6 +9,8 @@
  */
 namespace nb\request;
 
+use nb\Pool;
+
 /**
  * Native
  *
@@ -17,7 +19,27 @@ namespace nb\request;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/28
  */
-class Base extends Php {
+class Base extends Driver {
+
+    public function __construct($fd=null, $reactor_id=null, $data=null) {
+        $this->data = $data;
+        $this->fd = $fd;
+        $this->reactor_id = $reactor_id;
+        Pool::object('\event\Framework')->parser($this);
+    }
+
+
+    /**
+     * 获取表单数据，返回一个结果数组
+     * @param string $method
+     * @param null $args
+     * @return array
+     */
+    public function form($method='request',array $args=null) {
+        return $this->data;
+    }
+
+
 
 
 }

@@ -7,35 +7,16 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace nb;
-
+namespace nb\controller;
 /**
- * 控制器基类
+ * Php
  *
- * @package nb
+ * @package nb\controller
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
- * @date: 2018/7/25
- *
- * @property  View view
+ * @date: 2018/10/15
  */
-class Controller {
-
-    /**
-     * 获取表单参数的类型，request|post|get等等
-     * @var string
-     */
-    public $_method='request';
-
-    protected function assign($name, $value = ''){
-        $this->view->assign($name,$value);
-        return $this;
-    }
-
-    protected function display($template='', $vars = [], $config = []) {
-        $this->view->display($template, $vars, $config);
-    }
+class Php extends Driver {
 
     /**
      * 获取表单参数,并包装城Collection返回
@@ -121,37 +102,6 @@ class Controller {
         }
 
         return array_values($input);
-    }
-
-    /**
-     * 设置当参数验证失败时的回调函数
-     * @param $args 验证失败的参数名称
-     * @param $msg 失败原因
-     */
-    public function __error($msg,$args) {
-        Pool::object('nb\\event\\Framework')->validate(
-            $msg,
-            $args
-        );
-    }
-
-    public function __get($name) {
-        switch($name) {
-            case 'view':
-                return View::driver();
-            case 'isPost':
-                return Request::driver()->isPost;
-            case 'isGet':
-                return Request::driver()->isGet;
-            case 'isAjax':
-                return Request::driver()->isAjax;
-            default:
-                $method = '_' . $name;
-                if (method_exists($this, $method)) {
-                    return  $this->$method();
-                }
-                return null;
-        }
     }
 
 }

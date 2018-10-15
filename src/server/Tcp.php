@@ -88,6 +88,7 @@ class Tcp extends Swoole {
             ob_start();
             Pool::destroy();
             $this->fd = $fd;
+            \nb\Request::driver($fd,$reactor_id,$data);
             Dispatcher::run($data);
         }
         catch (\Throwable $e) {
@@ -128,6 +129,19 @@ class Tcp extends Swoole {
      */
     public function reply($data){
         return $this->swoole->send($this->fd,$data);
+    }
+
+    /**
+     * 关闭客户端连接
+     * 不要在close之后写清理逻辑。应当放置到onClose回调中处理
+     *
+     * @param int $fd
+     * @param bool $reset 设置为true会强制关闭连接，丢弃发送队列中的数据
+     * @return bool
+     */
+    public function close($fd=0, $reset = false) {
+        $fd or $fd = $this->fd;
+        return $this->swoole->close($fd,$reset);
     }
 
 }

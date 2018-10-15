@@ -27,12 +27,6 @@ class Service {
     public $msg;
     public $data;
 
-    //业务成功信息
-    //public $success;
-
-    //业务失败数据
-    //public $fail;
-
     protected $on = [];
 
     protected $controller;
@@ -40,7 +34,7 @@ class Service {
     //默认回调成功还是失败
     protected $defaultCall = 'fail';
 
-    public function __construct(Controller $controller) {
+    public function __construct($controller) {
         $this->controller = $controller;
     }
 
@@ -90,7 +84,6 @@ class Service {
      * @throws \ReflectionException
      */
     public static function trigger($condition=true,...$params) {
-
         //$this->middle(false);
         if ($condition == false) {
             return false;
@@ -100,7 +93,6 @@ class Service {
     }
 
     public static function withTrigger($condition=true,...$params) {
-
         //$this->middle(false);
         if ($condition == false) {
             return false;

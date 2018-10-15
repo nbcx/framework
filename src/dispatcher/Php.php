@@ -18,7 +18,7 @@ use nb\Validate;
 /**
  * Php
  *
- * @package nb\src\dispatcher
+ * @package nb\dispatcher
  * @link https://nb.cx
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/3
@@ -30,6 +30,7 @@ class Php extends Driver {
      * @var array
      */
     public $input = [];
+
     /**
      * 当前控制器需要的参数
      * @var array
