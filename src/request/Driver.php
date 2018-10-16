@@ -10,6 +10,7 @@
 namespace nb\request;
 
 use nb\Access;
+use nb\Pool;
 
 /**
  * Driver
@@ -32,64 +33,8 @@ abstract class Driver extends Access {
     protected $input;
     */
 
-    /**
-     * 获取表单数据，返回一个结果数组
-     * @param string $method
-     * @param null $args
-     * @return array
-     */
-    public function form($method='request',array $args=null) {
-        $method = $method === 'auto'?strtolower($this->method()):$method;
-        $input = [];
-        switch ($method) {
-            case 'request':
-                $input = $this->request;
-                break;
-            case 'post':
-                $input = $this->post;
-                break;
-            case 'get':
-                $input = $this->get;
-                break;
-            case 'request':
-                $input = $this->request;
-                break;
-            case 'input':
-                $input = $this->input;
-                break;
-            case 'put':
-                parse_str($this->input, $input);
-                break;
-            case 'files':
-                $input = $this->files;
-                break;
-            case 'server':
-                $input = $this->server;
-                break;
-        }
-        if($args) {
-            $_input = [];
-            foreach ($args as $arg) {
-                $_input[$arg] = isset($input[$arg])?$input[$arg]:null;
-            }
-            $input = $_input;
-        }
-        return $input;
-    }
-
-    /**
-     * 获取url的扩展名
-     * @return null
-     */
-    protected function _ext() {
-        $url = $this->uri;
-        $urlinfo =  parse_url($url);
-        $file = basename($urlinfo['path']);
-        if(strpos($file,'.') !== false) {
-            $ext = explode('.',$file);
-            return $ext[count($ext)-1];
-        }
-        return null;
+    public function __construct() {
+        Pool::object('nb\event\Framework')->request($this);
     }
 
 }

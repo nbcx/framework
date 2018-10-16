@@ -25,7 +25,7 @@ class Base extends Driver {
         $this->data = $data;
         $this->fd = $fd;
         $this->reactor_id = $reactor_id;
-        Pool::object('\event\Framework')->parser($this);
+        Pool::object('nb\event\Framework')->request($this);
     }
 
 
@@ -35,7 +35,7 @@ class Base extends Driver {
      * @param null $args
      * @return array
      */
-    public function form($method='request',array $args=null) {
+    public function form(array $args=null) {
         return $this->data;
     }
 

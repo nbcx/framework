@@ -52,7 +52,7 @@ class Config extends Access {
     //public $debug               = false;
 
     protected function _pool() {
-        return [];
+        return ['nb\event\Framework'];
     }
 
     //composer的autoload文件完整路径
@@ -264,18 +264,16 @@ class Config extends Access {
 
         Exception::register();
 
-        //后续调整到Config类里
         self::$o->register and Pool::object(
-            'nb\\event\\Framework',
+            'nb\event\Framework',
             Config::$o->register
         );
 
-        Pool::object('nb\\event\\Framework')->config(self::$o);
+        Pool::object('nb\event\Framework')->config(self::$o);
 
         self::$o->import(self::$o->path_autoinclude);
 
         is_file(self::$o->composer) and require self::$o->composer;
-
     }
 
     /**
@@ -400,6 +398,10 @@ class Config extends Access {
             is_string($exts) and $ext .= ','.$exts.'.php';
         }
         else {
+            if(is_string($exts)){
+                $ext .= ','.$exts.'.php';
+            }
+            /*
             $host = Request::driver()->host;
             if($host && is_array($exts) && isset($exts[$host])) {
                 $ext .= ','.$exts[$host].'.php';
@@ -407,6 +409,7 @@ class Config extends Access {
             else if(is_string($exts)){
                 $ext .= ','.$exts.'.php';
             }
+            */
         }
         $config = [];
         $ext .='}';
@@ -452,7 +455,6 @@ class Config extends Access {
                 break;
         }
         is_file($path) and include($path);
-        //is_file($path)?include($path):$this->_loadController($object,$ex,$count);
     }
 
     /**

@@ -42,9 +42,6 @@ class Php extends Driver {
 
     //private $_routes;
 
-    public function __construct($config=[]) {
-        $this->config = $config;
-    }
 
     /**
      * 路由必须解析

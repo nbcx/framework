@@ -95,7 +95,7 @@ class Tcp extends Swoole {
             $this->error($e);
         }
         Debug::end();
-        $server->send($fd,ob_get_contents());
+        $this->reply(ob_get_contents());
         ob_end_clean();
     }
 
@@ -118,7 +118,10 @@ class Tcp extends Swoole {
      * @return bool
      */
     public function send($fd, $data){
-        return $this->swoole->send($fd,$data);
+        if($this->swoole->exist($fd)) {
+            return $this->swoole->send($fd,$data);
+        }
+        return false;
     }
 
     /**
@@ -128,7 +131,7 @@ class Tcp extends Swoole {
      * @return bool
      */
     public function reply($data){
-        return $this->swoole->send($this->fd,$data);
+        return $this->send($this->fd,$data);
     }
 
     /**

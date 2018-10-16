@@ -103,12 +103,10 @@ abstract class Pool {
             $constructor = $reflect->newInstanceArgs($args);
         }
         */
-
         //固化
-        if(isset(Config::$o->pool[$alias])) {
+        if(in_array($alias,Config::$o->pool)) {
             self::$solidify[$alias] = $constructor;
         }
-
         return self::$pool[$alias] = $constructor;
     }
 
@@ -167,7 +165,7 @@ abstract class Pool {
         }
 
         //固化
-        if(isset(Config::$o->pool[$alias])) {
+        if(in_array($alias,Config::$o->pool)) {
             self::$solidify[$alias] = $value;
         }
 

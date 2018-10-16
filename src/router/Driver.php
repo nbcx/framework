@@ -11,6 +11,7 @@ namespace nb\router;
 
 use nb\Access;
 use nb\Config;
+use nb\Pool;
 
 /**
  * Driver
@@ -33,6 +34,18 @@ abstract class Driver extends Access {
      * @var folder
      */
 
+    /**
+     * 路由驱动构造函数
+     *
+     * Driver constructor.
+     * @throws \ReflectionException
+     */
+    public function __construct($config=[]) {
+        //路由解析前的回调函数
+        //可以重定路由，可以修改路由配置等
+        Pool::object('nb\\event\\Framework')->router($this);
+        $this->config = $config;
+    }
 
     /**
      * 调度器在戳发redirect事件后，将调用此函数

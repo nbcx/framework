@@ -100,7 +100,7 @@ class Websocket extends Http {
             $this->error($e);
         }
         Debug::end();
-        $server->push($this->fd,ob_get_contents());
+        $this->reply(ob_get_contents());
         ob_end_clean();
     }
 
@@ -118,7 +118,10 @@ class Websocket extends Http {
      * @return bool
      */
     public function send($fd, $data){
-        return $this->swoole->push($fd,$data);
+        if($this->swoole->exist($fd)) {
+            return $this->swoole->push($fd,$data);
+        }
+        return false;
     }
 
     /**
@@ -128,7 +131,7 @@ class Websocket extends Http {
      * @return bool
      */
     public function reply($data){
-        return $this->swoole->push($this->fd,$data);
+        return $this->send($this->fd,$data);
     }
 
     /**

@@ -43,7 +43,6 @@ class Framework {
         Exception::driver()->notfound();
     }
 
-
     /**
      * 当程序运行遇到错误，都会回调此方法
      *
@@ -77,12 +76,6 @@ class Framework {
         include __DIR__ . DS.'html'. DS.'hint.tpl.php';
         quit();
     }
-
-    /**
-     * 在路由解析前，会执行此方法，方便自定义一些特殊路由
-     * @param Router $router
-     */
-    public function redirect() {}
 
     /**
      * 此方法会在debug开始写记录文件时调用。
@@ -147,5 +140,17 @@ class Framework {
         unset($data['action']);
         return $action;
     }
+
+    /**
+     * 在Router驱动对象构造时，会执行此方法，方便自定义一些特殊路由
+     * @param Router $router
+     */
+    public function router(\nb\router\Driver $router) {}
+
+
+    /**
+     * 在Request驱动对象构造时，将执行此函数
+     */
+    public function request(\nb\request\Driver $request) { }
 
 }

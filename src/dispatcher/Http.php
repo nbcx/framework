@@ -47,15 +47,11 @@ class Http extends Php {
      * @throws \ReflectionException
      */
     private function doWith() {
-        //路由解析前的回调函数
-        //可以重定路由，可以修改路由配置等
-        Pool::object('nb\\event\\Framework')->redirect();
-
         //判断是否为模块绑定
         $module = Config::$o->module_bind;
-        if($module && isset($module[$host = Request::ins()->host])) {
+        if($module && isset($module[$host = Request::driver()->host])) {
             $this->module($module[$host]);
-            $router = Router::ins();
+            $router = Router::driver();
             $router->module = $module[$host];
             $router->mustAnalyse();
         }
