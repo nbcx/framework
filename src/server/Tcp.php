@@ -95,7 +95,7 @@ class Tcp extends Swoole {
             $this->error($e);
         }
         Debug::end();
-        $this->reply(ob_get_contents());
+        $data = ob_get_contents() and $this->reply($data);
         ob_end_clean();
     }
 
