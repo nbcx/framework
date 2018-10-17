@@ -10,6 +10,9 @@
  */
 
 namespace nb\controller;
+use nb\Access;
+use nb\Controller;
+
 /**
  * Driver
  *
@@ -18,7 +21,15 @@ namespace nb\controller;
  * @author: collin <collin@nb.cx>
  * @date: 2018/10/15
  */
-abstract class Driver {
+abstract class Driver extends Access {
 
+    /**
+     * @var Controller
+     */
+    protected $controller;
+
+    public function __construct(Controller $nb) {
+        $this->controller = $nb;
+    }
 
 }

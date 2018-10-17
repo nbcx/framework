@@ -24,7 +24,6 @@ abstract class Component {
     public function __construct() {
         $args = func_get_args();
         $args[] = static::config();
-        //array_unshift($args,static::config());
         $this->driver =  call_user_func_array(
             'static::create',
             $args

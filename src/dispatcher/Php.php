@@ -13,7 +13,6 @@ use nb\Config;
 use nb\Pool;
 use nb\Request;
 use nb\Router;
-use nb\Validate;
 
 /**
  * Php

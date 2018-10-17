@@ -135,8 +135,6 @@ class Http extends Php {
 
 
     protected function module($module) {
-        //return true;
-
         $conf = Config::$o;
         $conf_file = __APP__.$conf->folder_module.DS.$module.DS.'config.inc.php';
 
@@ -157,11 +155,9 @@ class Http extends Php {
 
             foreach ($config as $k=>$v) {
                 $conf->$k = $v;
-                //Config::setx($k,$v);
             }
         }
         else {
-            //$conf->view['view_path'] = __APP__.$conf->module.DS.$module.DS.'view'.DS;
             $conf->import(
                 [__APP__.$conf->folder_module.DS.$module.DS.'include'.DS],
                 $conf->path_autoext

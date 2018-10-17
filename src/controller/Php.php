@@ -8,6 +8,13 @@
  * file that was distributed with this source code.
  */
 namespace nb\controller;
+
+use nb\Collection;
+use nb\Pool;
+use nb\Request;
+use nb\Validate;
+use nb\View;
+
 /**
  * Php
  *
@@ -15,8 +22,25 @@ namespace nb\controller;
  * @link https://nb.cx
  * @author: collin <collin@nb.cx>
  * @date: 2018/10/15
+ *
+ * @property View view
  */
 class Php extends Driver {
+
+    /**
+     * 获取表单参数的类型，request|post|get等等
+     * @var string
+     */
+    //public $_method='request';
+
+    public function assign($name, $value = ''){
+        $this->view->assign($name,$value);
+        return $this;
+    }
+
+    public function display($template='', $vars = [], $config = []) {
+        $this->view->display($template, $vars, $config);
+    }
 
     /**
      * 获取表单参数,并包装城Collection返回
@@ -41,7 +65,7 @@ class Php extends Driver {
     public function form($method='request', ...$args){
         if(is_array($method)) {
             $args = $method;
-            $method = $this->_method;
+            $method = $this->method;
             //$this->form(['name','pass']);
         }
         else if($args && is_array($args[0])) {
@@ -50,7 +74,7 @@ class Php extends Driver {
         }
 
         //$this->form('get','name','pass');
-        $method === null and $method = $this->_method;
+        $method === null and $method = $this->method;
 
         $form = Request::form($method,$args);
 
@@ -81,7 +105,7 @@ class Php extends Driver {
             else {
                 //$this->input('name','pass');
                 array_unshift($args,$arg);
-                $args = [$this->_method,$args];
+                $args = [$this->method,$args];
             }
         }
         else {
@@ -103,5 +127,28 @@ class Php extends Driver {
 
         return array_values($input);
     }
+
+    protected function _isAjax() {
+        return Request::driver()->isAjax;
+    }
+
+    protected function _isGet() {
+        return Request::driver()->isGet;
+    }
+
+    protected function _isPost() {
+        return Request::driver()->isPost;
+    }
+
+    protected function _view() {
+        return View::driver();
+    }
+
+    protected function _method() {
+        $exists = property_exists($this->controller,'_method');
+        return $exists?$this->controller->_method:'request';
+    }
+
+
 
 }
