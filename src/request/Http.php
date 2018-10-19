@@ -33,7 +33,6 @@ class Http extends Php {
         if(!$this->req) {
             $this->req = new \StdClass();
         }
-        Pool::object('nb\event\Framework')->request($this);
     }
 
     public function _input() {

@@ -28,7 +28,6 @@ class Websocket extends Base {
     public function __construct() {
         $this->frame = Pool::get('\swoole\websocket\Frame');
         $this->frame or $this->frame = new \StdClass();
-        Pool::object('nb\event\Framework')->request($this);
     }
 
     public function _data() {

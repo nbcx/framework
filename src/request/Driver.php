@@ -33,8 +33,4 @@ abstract class Driver extends Access {
     protected $input;
     */
 
-    public function __construct() {
-        Pool::object('nb\event\Framework')->request($this);
-    }
-
 }

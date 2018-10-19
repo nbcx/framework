@@ -47,7 +47,7 @@ abstract class Component {
      * 获取驱动对象，以单列的模式保存在对象池里
      * @return driver
      */
-    public static function driver(){
+    public static function driver() {
         $key = get_called_class();
         if($driver = Pool::get($key)) {
             return $driver;

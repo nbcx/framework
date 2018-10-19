@@ -25,9 +25,11 @@ class Base extends Driver {
         $this->data = $data;
         $this->fd = $fd;
         $this->reactor_id = $reactor_id;
-        Pool::object('nb\event\Framework')->request($this);
     }
 
+    protected function ___data() {
+        trigger_error('property data is read-only');
+    }
 
     /**
      * 获取表单数据，返回一个结果数组
@@ -36,9 +38,12 @@ class Base extends Driver {
      * @return array
      */
     public function form(array $args=null) {
-        return $this->data;
+        return $this->input;
     }
 
+    public function _input() {
+        return $this->data;
+    }
 
 
 

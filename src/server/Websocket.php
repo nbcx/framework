@@ -94,14 +94,14 @@ class Websocket extends Http {
             Pool::destroy();
             $this->fd = $frame->fd;
             Pool::set('\swoole\websocket\Frame', $frame);
-            Dispatcher::run();//$frame->data
+            Dispatcher::run();
         }
         catch (\Throwable $e) {
             $this->error($e);
         }
-        Debug::end();
         $data = ob_get_contents() and $this->reply($data);
         ob_end_clean();
+        Debug::end();
     }
 
     /**

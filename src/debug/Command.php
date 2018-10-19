@@ -25,13 +25,13 @@ use nb\Pool;
  */
 class Command extends Driver {
 
-	private $show = [];
+    protected $show = [];
 	private $key;
 	private $ip;
-	private $n = 10;
+    protected $n = 10;
 	private $page = false;
 
-	private $startd = false;
+	protected $startd = false;
 
     public function __construct() {
         $config = Config::getx('debug');
@@ -88,7 +88,7 @@ class Command extends Driver {
 	 */
 	public function end(){
         //如果请求的控制器是debug就算了！
-        if (Router::ins()->controller == 'debug') {
+        if (Router::driver()->controller == 'debug') {
             return false;
         }
 

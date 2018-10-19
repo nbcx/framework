@@ -32,7 +32,6 @@ class Php extends Driver {
             'cookie'  => &$_COOKIE,
             'server'  => &$_SERVER
         ];
-        Pool::object('nb\event\Framework')->request($this);
     }
 
     /**

@@ -20,18 +20,32 @@ namespace nb;
  */
 class Request extends Component {
 
-    /**
-     * @var \nb\request\Driver
-     */
-    public static function ins() {
-        return self::driver();
-    }
-
     public static function config() {
         if(isset(Config::$o->request)) {
             return Config::$o->request;
         }
         return null;
+    }
+
+    /**
+     * 获取驱动对象，以单列的模式保存在对象池里
+     * @return driver
+     */
+    public static function driver() {
+        $key = get_called_class();
+        if($driver = Pool::get($key)) {
+            return $driver;
+        }
+        $args = func_get_args();
+        $config = static::config();
+        $config and array_unshift($args,$config);
+        $class =  call_user_func_array(
+            'static::create',
+            $args
+        );
+        $request = Pool::set($key,$class);
+        Pool::object('nb\event\Framework')->request($request);
+        return $request;
     }
 
     /**
