@@ -129,28 +129,6 @@ class Debug extends Component {
         if(!Config::$o->debug) return;
 
         self::driver()->ex($var, $detailed, $label, $flags);
-        /*
-        $label = (null === $label) ? '' : rtrim($label) . ':';
-
-        if (is_object($var)) { //$var instanceof \nb\Collection
-            $detailed = false;
-        }
-        ob_start();
-        $detailed?var_dump($var):print_r($var);
-        $output = ob_get_clean();
-        $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
-
-        if (Config::$o->sapi == 'cli') {
-            $output = PHP_EOL . $label . $output . PHP_EOL;
-        }
-        else {
-            if (!extension_loaded('xdebug')) {
-                $output = htmlspecialchars($output, $flags);
-            }
-            $output = '<pre>' . $label . $output . '</pre>';
-        }
-        echo $output;
-        */
     }
 
     /**

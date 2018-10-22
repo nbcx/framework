@@ -94,7 +94,7 @@ abstract class Driver extends Access {
 
         $this->alias = $tableAlias;
         $this->name = $tableName;
-        $this->prefix = $server['prefix'];
+        $this->prefix = $this->server['prefix'];
         $this->table = $this->prefix.$tableName;
     }
 
