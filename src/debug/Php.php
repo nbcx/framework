@@ -17,7 +17,7 @@ use nb\Session;
 use nb\Pool;
 
 /**
- * Native
+ * Php
  *
  * @package nb\debug
  * @link https://nb.cx
@@ -113,7 +113,7 @@ class Php extends Driver {
 	/**
 	 * @return Debug
 	 */
-	public function start($synchronous = true){
+	public function start(){
         $this->record['mem'] =  array_sum(explode(' ',memory_get_usage()));
         $this->record['sql'] = [];
         $this->record['exception'] = [];

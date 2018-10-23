@@ -46,8 +46,8 @@ class Websocket extends Http {
     ];
 
     protected $call = [
-        'start',
-        'shutdown',
+        //'start',
+        //'shutdown',
         'workerStart',
         'workerStop',
         'workerExit',
@@ -75,15 +75,24 @@ class Websocket extends Http {
         $server = new \swoole\websocket\Server($this->options['host'], $this->options['port']);
         $server->set($this->options);
 
-        //设置server回调事件
+        //注册server启动和结束回调
+        $server->on('start',[$this,'__start']);
+        $server->on('shutdown',[$this,'__shutdown']);
+
+        //设置websocket数据请求回调事件
         $server->on('message',[$this,'message']);
+
         $this->options['request'] and $server->on('request',[$this,'request']);
+
         $callback = new $this->options['register']();
+        $this->callback = $callback;
+
         foreach ($this->call as  $v) {
             $server->on($v,[$callback,$v]);
         }
-        $this->swoole = $server;
+
         //启动server
+        $this->swoole = $server;
         $this->swoole->start();
     }
 

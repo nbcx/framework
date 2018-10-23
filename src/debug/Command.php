@@ -70,7 +70,7 @@ class Command extends Driver {
 	/**
 	 * @return Debug
 	 */
-	public function start($synchronous = true){
+	public function start(){
         $this->record['mem'] =  array_sum(explode(' ',memory_get_usage()));
         $this->record['start'] = time();
         $this->record['spend'] = microtime(true);

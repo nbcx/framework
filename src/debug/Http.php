@@ -1,9 +1,11 @@
 <?php
-/**
- * 调式信息类
- * 开启DEBUG后。通过../debug/function访问
- * User: chenxiong<cxmvc@qq.com>
- * Date: 2013-09-15
+/*
+ * This file is part of the NB Framework package.
+ *
+ * Copyright (c) 2018 https://nb.cx All rights reserved.
+ *
+ * For the full copyright and license information, please view the LICENSE
+ * file that was distributed with this source code.
  */
 namespace nb\debug;
 
@@ -28,7 +30,6 @@ class Http extends Php {
 	//是否已经中断程序运行了
 	private $died = false;
 
-
     /**
      * 是否为同步进程
      * @return mixed
@@ -45,14 +46,13 @@ class Http extends Php {
         return !$this->synchronous;
     }
 
-
 	/**
 	 * 统计信息，存入Bug
 	 */
 	public function end(){
 
         //如果请求的控制器是debug就算了！
-        if (Router::ins()->controller == 'debug') {
+        if (Router::driver()->controller == 'debug') {
             return false;
         }
 
@@ -87,7 +87,6 @@ class Http extends Php {
             $record['method'] = 'asynchronous';
             $record['ip'] = '0.0.0.0';
         }
-
 
         $record['spend'] = round(microtime(true) - $request->requestTimeFloat,4);
         $record['mem'] = number_format((array_sum(explode(' ',memory_get_usage())) - $record['mem'])/1024).'kb';

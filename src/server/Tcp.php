@@ -46,8 +46,8 @@ class Tcp extends Swoole {
     ];
 
     protected $call = [
-        'start',
-        'shutdown',
+        //'start',
+        //'shutdown',
         'workerStart',
         'workerStop',
         'workerExit',
@@ -71,8 +71,13 @@ class Tcp extends Swoole {
         $server = new \swoole\Server($this->options['host'], $this->options['port']);
         $server->set($this->options);
 
-        //设置server回调事件
+        //注册server启动和结束回调
+        $server->on('start',[$this,'__start']);
+        $server->on('shutdown',[$this,'__shutdown']);
+
+        //设置server请求数据处理回调事件
         $server->on('receive',[$this,'receive']);
+
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
             $server->on($v,[$callback,$v]);

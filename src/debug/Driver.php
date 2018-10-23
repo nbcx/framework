@@ -28,7 +28,7 @@ abstract class Driver {
 	/**
 	 * @return Debug
 	 */
-	abstract public function start($synchronous = true);
+	abstract public function start();
 
     /**
      *
