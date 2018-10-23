@@ -34,13 +34,13 @@ class Websocket extends Http {
         'register'=>'',//注册一个类，来实现swoole自定义事件
         'host'=>'0.0.0.0',
         'port'=>9503,
-        'max_request'=>'',//worker进程的最大任务数
-        'worker_num'=>'',//设置启动的worker进程数。
+        'max_request'=>'3',//worker进程的最大任务数
+        'worker_num'=>'0',//设置启动的worker进程数。
         'dispatch_mode'=>2,//据包分发策略,默认为2
         'debug_mode'=>3,
         'enable_gzip'=>0,//是否启用压缩，0为不启用，1-9为压缩等级
-        'enable_log'=>__APP__.'tmp'.DS.'swoole-socket.log',
-        'enable_pid'=>'/tmp/swoole.pid',
+        'enable_log'=>__APP__.'tmp'.DS.'socket.log',
+        'enable_pid'=>__APP__.'tmp'.DS.'socket.pid',
         'daemonize'=>true,
         'request'=>false,//启用内置的onRequest回调
     ];
@@ -98,8 +98,8 @@ class Websocket extends Http {
 
     public function message(\swoole\websocket\Server $server, \swoole\websocket\Frame $frame) {
         try {
-            Config::$o->sapi='websocket';
             ob_start();
+            Config::$o->sapi='websocket';
             Pool::destroy();
             $this->fd = $frame->fd;
             Pool::set('\swoole\websocket\Frame', $frame);

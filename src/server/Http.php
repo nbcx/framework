@@ -75,11 +75,11 @@ class Http extends Swoole {
         $server->set($this->options);
 
         //注册server启动和结束回调
-        $server->on('start',[$this,'__start']);
-        $server->on('shutdown',[$this,'__shutdown']);
+        $server->on('start', [$this,'__start']);
+        $server->on('shutdown', [$this,'__shutdown']);
 
         //设置httpserver数据请求回调事件
-        $server->on('request',    [$this,'request']);
+        $server->on('request', [$this,'request']);
 
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
@@ -91,8 +91,8 @@ class Http extends Swoole {
 
     public function request(\swoole\http\Request $request, \swoole\http\Response $response) {
         try {
-            Config::$o->sapi='http';
             ob_start();
+            Config::$o->sapi='http';
             Pool::destroy();
             Pool::set('\swoole\http\Request', $request);
             Pool::set('\swoole\http\Response',$response);

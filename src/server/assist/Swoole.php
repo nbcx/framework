@@ -101,10 +101,7 @@ abstract class Swoole extends Driver {
         $pid = file_exists($enable_pid) ? file_get_contents($enable_pid) : 0;
         // 检查进程是否真正存在
         if ($pid && !posix_kill($pid, 0)) {
-            $errno = posix_get_last_error();
-            if ($errno === 3) {
-                $pid = 0;
-            }
+            posix_get_last_error() === 3 and $pid = 0;
         }
         return $pid;
     }
@@ -168,8 +165,7 @@ abstract class Swoole extends Driver {
      */
     public function __start(\swoole\Server $server) {
         $pid = posix_getpid();
-        $path = $this->options['enable_pid'];//Config::getx('swoole.enable_pid');
-        file_put_contents($path, $pid);
+        file_put_contents($this->options['enable_pid'], $pid);
 
         if(method_exists($this->callback,'start')) {
             $this->callback->start($server);

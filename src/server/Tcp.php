@@ -89,8 +89,8 @@ class Tcp extends Swoole {
 
     public function receive($server, $fd, $reactor_id, $data) {
         try {
-            Config::$o->sapi='tcp';
             ob_start();
+            Config::$o->sapi='tcp';
             Pool::destroy();
             $this->fd = $fd;
             \nb\Request::driver($fd,$reactor_id,$data);
