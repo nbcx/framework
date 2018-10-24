@@ -21,6 +21,9 @@ use Countable;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/30
+ *
+ * @property  boolean empty
+ * @property  boolean have
  */
 class Collection extends Access implements Iterator, JsonSerializable, Countable {
 
@@ -50,7 +53,7 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
      * 是否为空
      * @return bool
      */
-    public function _empty() {
+    protected function _empty() {
         return empty($this->stack);
     }
 
@@ -58,7 +61,7 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
      * 是否不为空
      * @return bool
      */
-    public function _have() {
+    protected function _have() {
         return !$this->empty;
     }
 
