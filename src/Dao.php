@@ -30,14 +30,9 @@ use PDO;
  * @method \nb\dao\Driver truncate() 删除表
  *
  * @property  PDO db
+ * @property  \nb\dao\Driver driver
  */
 class Dao extends Component {
-
-	/**
-	 * Driver对象
-	 * @var \nb\dao\Driver
-	 */
-	public $driver;
 
     public static function config($name = 'dao') {
         // TODO: Implement config() method.

@@ -137,7 +137,7 @@ class Redis extends Driver {
      * @param string $name 缓存变量名
      * @return boolean
      */
-    public function rm($name) {
+    public function delete($name) {
         return $this->handler->delete($name);
     }
 
@@ -147,9 +147,9 @@ class Redis extends Driver {
      * @param string $pattern 匹配符
      * @return boolean
      */
-    public function clear($pattern = null) {
+    public function rm($pattern = null) {
         if ($pattern) {
-            $this->rm($this->handler->keys($pattern));
+            $this->delete($this->handler->keys($pattern));
             return true;
         }
         return $this->handler->flushDB();

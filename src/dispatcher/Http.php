@@ -49,15 +49,16 @@ class Http extends Php {
     private function doWith() {
         //判断是否为模块绑定
         $module = Config::$o->module_bind;
+        $router = Router::driver();
         if($module && isset($module[$host = Request::driver()->host])) {
             $this->module($module[$host]);
-            $router = Router::driver();
+            $router = $router;
             $router->module = $module[$host];
             $router->mustAnalyse();
         }
         else {
             //判断是否为绑定模块
-            $router = Router::ins()->mustAnalyse();
+            $router->mustAnalyse();
             //如果访问的模块，加载模块配置
             if($router->module) {
                 $this->module($router->module);

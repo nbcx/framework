@@ -71,7 +71,7 @@ abstract class Driver {
      * @param string $name 缓存变量名
      * @return boolean
      */
-    abstract public function rm($name);
+    abstract public function delete($name);
 
     /**
      * 清除缓存
@@ -79,7 +79,7 @@ abstract class Driver {
      * @param string $pattern 匹配符
      * @return boolean
      */
-    abstract public function clear($pattern = null);
+    abstract public function rm($pattern = null);
 
     /**
      * 读取缓存并删除

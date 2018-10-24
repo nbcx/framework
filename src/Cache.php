@@ -17,13 +17,10 @@ namespace nb;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/3/30
+ *
+ * @property  \nb\cache\Driver driver
  */
 class Cache extends Component {
-
-    /**
-     * @var \nb\cache\Driver
-     */
-    //public $driver;
 
     public static function config(){
         return Config::$o->cache;
@@ -141,8 +138,8 @@ class Cache extends Component {
      *
      * @param null $tag
      */
-    public static function clear($tag = null) {
-        return self::driver()->clear($tag);
+    public static function rm($tag = null) {
+        return self::driver()->rm($tag);
     }
 
     /**
@@ -151,8 +148,8 @@ class Cache extends Component {
      * @param null $name
      * @return mixed
      */
-    public static function rm($name=null) {
-        return self::driver()->rm($name);
+    public static function delete($name=null) {
+        return self::driver()->delete($name);
     }
 
     /**

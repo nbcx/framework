@@ -150,7 +150,7 @@ class Memcached extends Driver {
      * @param bool|false $ttl
      * @return bool
      */
-    public function rm($name, $ttl = false) {
+    public function delete($name, $ttl = false) {
         return false === $ttl ?
             $this->handler->delete($name) :
             $this->handler->delete($name, $ttl);
@@ -164,7 +164,7 @@ class Memcached extends Driver {
      *
      * Memcache 暂不支持模糊删除，批量删除，可以传入一个数组key
      */
-    public function clear($pattern = null) {
+    public function rm($pattern = null) {
         if ($pattern) {
             // 指定标签清除
             //$keys = $this->getTagItem($tag);

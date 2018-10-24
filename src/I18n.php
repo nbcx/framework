@@ -21,14 +21,6 @@ namespace nb;
 class I18n extends Component {
 
     /**
-     * 是否已经加载了语言文件
-     *
-     * @access private
-     * @var boolean
-     */
-    //private $_loaded = false;
-
-    /**
      * 语言文件
      *
      * @access private

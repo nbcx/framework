@@ -11,6 +11,7 @@ namespace nb\exception;
 
 
 use nb\Config;
+use nb\I18n;
 use nb\Router;
 
 /**

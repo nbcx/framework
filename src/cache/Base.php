@@ -173,7 +173,7 @@ class Base extends Driver {
      * @param string $name 缓存变量名
      * @return boolean
      */
-    public function rm($name) {
+    public function delete($name) {
         return $this->unlink($this->getCacheKey($name));
     }
 
@@ -184,7 +184,7 @@ class Base extends Driver {
      * @param string $tag 标签名
      * @return boolean
      */
-    public function clear($pattern = null) {
+    public function rm($pattern = null) {
         if($pattern) {
             $files = $this->options['path'] . $pattern;
         }

@@ -42,7 +42,7 @@ class Websocket extends Http {
         'enable_log'=>__APP__.'tmp'.DS.'socket.log',
         'enable_pid'=>__APP__.'tmp'.DS.'socket.pid',
         'daemonize'=>true,
-        'request'=>false,//启用内置的onRequest回调
+        'enable_http'=>false,//同时启用http服务
     ];
 
     protected $call = [
@@ -82,7 +82,7 @@ class Websocket extends Http {
         //设置websocket数据请求回调事件
         $server->on('message',[$this,'message']);
 
-        $this->options['request'] and $server->on('request',[$this,'request']);
+        $this->options['enable_http'] and $server->on('request',[$this,'request']);
 
         $callback = new $this->options['register']();
         $this->callback = $callback;
