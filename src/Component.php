@@ -127,11 +127,7 @@ abstract class Component {
      */
     public static function __callStatic($method, $arguments) {
         // TODO: Implement __callStatic() method.
-        $that = static::driver();
-        if (method_exists($that, $method)) {
-            return call_user_func_array([$that,$method],$arguments);
-        }
-        return null;
+        return call_user_func_array([static::driver(),$method],$arguments);
     }
 
     public function __call($name, $arguments) {

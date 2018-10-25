@@ -19,6 +19,12 @@ namespace nb;
  * @date: 2018/7/25
  *
  * @property  View view
+ *
+ * @method display()
+ * @method assign()
+ * @method formx(...$args)
+ * @method form(...$args)
+ * @method input(...$args)
  */
 class Controller extends Component {
 
