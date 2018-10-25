@@ -74,6 +74,15 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
         return $this->stack;
     }
 
+
+    /**
+     * 返回将已经缓存的数据覆盖堆栈原始数据
+     * @return array
+     */
+    public function mingle() {
+        return array_merge($this->stack,$this->tmp);
+    }
+
     /**
      * 截取数组
      * stack
@@ -94,7 +103,6 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
     public function reverse() {
         $this->stack = array_reverse($this->stack);
         return $this;
-        //return new static(array_reverse($this->_stack));
     }
 
     /**
