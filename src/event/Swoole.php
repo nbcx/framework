@@ -65,26 +65,6 @@ class Swoole {
         l('finish--$data:'.$data);
     }
 
-    /**
-     * 此事件在Worker进程/Task进程启动时发生。这里创建的对象可以在进程生命周期内使用
-     *
-     * 发生致命错误或者代码中主动调用exit时，Worker/Task进程会退出，管理进程会重新创建新的进程
-     * onWorkerStart/onStart是并发执行的，没有先后顺序
-     * 可以通过$server->taskworker属性来判断当前是Worker进程还是Task进程
-     *
-     * @param \swoole\Server $server
-     * @param $worker_id
-     */
-    /*
-    public function workerStar(\swoole\Server $server,$worker_id) {
-        $conf = Config::$o->swoole;
-        if($worker_id >= $conf['worker_num']) {
-            swoole_set_process_name("php-{$conf['part']}-task-worker");
-        }
-        else {
-            swoole_set_process_name("php-{$conf['part']}-event-worker");
-        }
-    }
-    */
+
 
 }
