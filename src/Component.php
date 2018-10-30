@@ -19,7 +19,7 @@ namespace nb;
  */
 abstract class Component {
 
-    protected $driver;
+    public $driver;
 
     public function __construct() {
         $args = func_get_args();
