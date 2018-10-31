@@ -268,6 +268,23 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
     }
 
     /**
+     * 获取原始数据
+     * @param $name
+     * @return mixed|null
+     */
+    public function raw($name) {
+        // TODO: Implement __get() method.
+        if (isset($this->row[$name])) { //array_key_exists($name, $this->_row)
+            return  $this->row[$name];
+        }
+        if(isset($this->stack[$name])){
+            $this->row = &$this->stack;
+            return $this->row[$name];
+        }
+        return null;
+    }
+
+    /**
      * 获取当前行中的值
      * @param $name
      * @return mixed|null
