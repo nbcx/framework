@@ -38,11 +38,38 @@ class Base extends Driver {
      * @return array
      */
     public function form(array $args=null) {
-        return $this->input;
+        $input = $this->input;
+        if($args) {
+            $_input = [];
+            foreach ($args as $arg) {
+                $_input[$arg] = isset($input[$arg])?$input[$arg]:null;
+            }
+            $input = $_input;
+        }
+        return $input;
     }
 
     public function _input() {
         return $this->data;
+    }
+
+    public function input($args) {
+        if(!is_array($args)) {
+            //$this->input(['name','pass']);
+            $args = [$args];
+        }
+
+        $input = $this->form($args);
+
+        if(is_array($input) === false) {
+            return null;
+        }
+
+        if(count($input) == 1) {
+            return current($input);
+        }
+
+        return array_values($input);
     }
 
 

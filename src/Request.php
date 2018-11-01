@@ -78,7 +78,12 @@ class Request extends Component {
      * @param array ...$args
      * @return array|mixed|null
      */
-    public static function input($arg,...$args){
+    public static function input(...$args){
+
+        return call_user_func_array([self::driver(),'input'],$args);
+
+
+        /////待移除
         /** $args != null */
         if($args) {
             if(is_array($args[0])) {
