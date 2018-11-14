@@ -98,7 +98,7 @@ class Http extends Php {
             return false;
         }
 
-        $ext = Request::ins()->ext;
+        $ext = Request::driver()->ext;
         if(!$ext || false === strpos($conf['allow'], $ext)) {
             return false;
         }
