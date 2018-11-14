@@ -79,15 +79,14 @@ class Php extends Driver {
         $form = Request::form($method,$args);
 
         $va = Pool::get(Validate::class);
-        if(!$va) {
+
+        if(!$va || $va->scene('_form_',$args)->check($form)) {
             return $form;
         }
 
-        if($va->scene('_form_',$args)->check($form)) {
-            return $form;
-        }
-        return $this->__error($va->error, $va->field);
+        return  Pool::get('controller')->__error($va->error, $va->field);
     }
+
 
     /**
      * 获取表单参数对应的值
@@ -148,7 +147,6 @@ class Php extends Driver {
         $exists = property_exists($this->controller,'_method');
         return $exists?$this->controller->_method:'request';
     }
-
 
 
 }
