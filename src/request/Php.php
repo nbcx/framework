@@ -385,4 +385,47 @@ class Php extends Driver {
         return $input;
     }
 
+    /**
+     * 获取表单参数对应的值
+     * 如果获取多个，则以值数组的形式返回
+     *
+     * @param $arg
+     * @param array ...$args
+     * @return array|mixed|null
+     */
+    public function input($arg,...$args){
+        /** $args != null */
+        if($args) {
+            if(is_array($args[0])) {
+                //$this->input('get',['name','pass']);
+                $args = $args[0];
+                $method = $arg;
+            }
+            else {
+                //$this->input('name','pass');
+                array_unshift($args,$arg);
+                $method = 'request';
+            }
+        }
+        else {
+            /** $args == null */
+            //$this->input('name');
+            //$this->input(['name','pass']);
+            $args = [$arg];
+            $method = 'request';
+        }
+
+        $input = $this->form($method,$args);
+
+        if(is_array($input) === false) {
+            return null;
+        }
+
+        if(count($input) == 1) {
+            return current($input);
+        }
+
+        return array_values($input);
+    }
+
 }
