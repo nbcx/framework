@@ -32,7 +32,6 @@ class Http extends Php {
      * @throws \ReflectionException
      */
     public function shutdown() {
-        l('shutdown','err');
         //!\nb\Server::$o ||
         if(Debug::driver()->synchronous() && !Pool::get('\swoole\http\Request')) {
             return;
@@ -55,16 +54,5 @@ class Http extends Php {
         Debug::end();
         Pool::destroy();
     }
-    /*
-    protected function show($e,$deadly = false) {
-        if (Config::$o->debug && $deadly) {
-            if(ob_get_level() > 0) {
-                ob_clean();
-            }
-            include __NB__ . 'templet' . DS . 'exception.tbl.php';
-        }
-    }
-    */
-
 
 }

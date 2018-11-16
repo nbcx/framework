@@ -65,68 +65,6 @@ class Swoole {
         l('finish--$data:'.$data);
     }
 
-    /**
-     * Server启动在主进程的主线程回调此函数
-     * 在此事件之前Swoole Server已进行了如下操作
-     *   已创建了manager进程
-     *   已创建了worker子进程
-     *   已监听所有TCP/UDP端口
-     *   已监听了定时器
-     * onStart回调中，仅允许echo、打印Log、修改进程名称。不得执行其他操作。
-     * onWorkerStart和onStart回调是在不同进程中并行执行的，不存在先后顺序。
-     * @param swoole_server $server
-     */
-    public function start(\swoole\Server $server) {
-        $pid = posix_getpid();
-        $path = Config::getx('swoole.enable_pid');
-        if ($path) {
-            file_put_contents($path, $pid);
-        }
-        else {
-            file_put_contents('/tmp/swoole.pid', $pid);
-        }
-    }
 
-    /**
-     * 当服务关闭时触发
-     * 在此之前Swoole Server已进行了如下操作
-     *   已关闭所有线程
-     *   已关闭所有worker进程
-     *   已close所有TCP/UDP监听端口
-     *   已关闭主Rector
-     * @param swoole_server $server
-     */
-    public function shutdown(\swoole\Server $server) {
-        $pid_file = '/tmp/swoole.pid';
-        $path = Config::getx('swoole.enable_pid');
-        if ($path) {
-            $pid_file = $path;
-        }
-        if (file_exists($pid_file)) {
-            unlink($pid_file);
-        }
-    }
-
-    /**
-     * 此事件在Worker进程/Task进程启动时发生。这里创建的对象可以在进程生命周期内使用
-     *
-     * 发生致命错误或者代码中主动调用exit时，Worker/Task进程会退出，管理进程会重新创建新的进程
-     * onWorkerStart/onStart是并发执行的，没有先后顺序
-     * 可以通过$server->taskworker属性来判断当前是Worker进程还是Task进程
-     *
-     * @param \swoole\Server $server
-     * @param $worker_id
-     */
-    /*
-    public function workerStar(\swoole\Server $server,$worker_id) {
-        $conf = Config::$o->swoole;
-        if($worker_id >= $conf['worker_num']) {
-            swoole_set_process_name("php-{$conf['part']}-task-worker");
-        }
-        else {
-            swoole_set_process_name("php-{$conf['part']}-event-worker");
-        }
-    }
-    */
 
 }

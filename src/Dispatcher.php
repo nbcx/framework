@@ -17,15 +17,10 @@ namespace nb;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/3
+ *
+ * @property  \nb\dispatcher\Driver driver
  */
 class Dispatcher extends Component {
-
-    /**
-     * @var dispatcher\Driver
-     */
-    //public $driver;
-
-    //use \nb\library\Instance;
 
     public static function config() {
         if(isset(Config::$o->dispatcher)) {

@@ -134,21 +134,6 @@ class Base extends Driver {
     }
 
     /**
-     * 修改缓存数组里的某一些个值
-     * @param $name
-     * @param array $value
-     * @param null $expire
-     * @return bool
-     */
-    public function update($name, array $value, $expire = null){
-        $result = $this->get($name);
-        if(is_array($result)) {
-            return $this->set($name,array_merge($result,$value),$expire);
-        }
-        return $this->set($name,$value,$expire);
-    }
-
-    /**
      * 自增缓存（针对数值缓存）
      * @access public
      * @param string $name 缓存变量名
@@ -188,7 +173,7 @@ class Base extends Driver {
      * @param string $name 缓存变量名
      * @return boolean
      */
-    public function rm($name) {
+    public function delete($name) {
         return $this->unlink($this->getCacheKey($name));
     }
 
@@ -199,7 +184,7 @@ class Base extends Driver {
      * @param string $tag 标签名
      * @return boolean
      */
-    public function clear($pattern = null) {
+    public function rm($pattern = null) {
         if($pattern) {
             $files = $this->options['path'] . $pattern;
         }
@@ -212,8 +197,6 @@ class Base extends Driver {
     /**
      * 判断文件是否存在后，删除
      * @param $path
-     * @return bool
-     * @author byron sampson <xiaobo.sun@qq.com>
      * @return boolean
      */
     private function unlink($path) {

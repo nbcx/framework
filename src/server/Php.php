@@ -36,7 +36,7 @@ class Php extends Driver {
         }
     }
 
-    public function start($daemonize=true){
+    public function start($daemonize=true) {
         $host = $this->config['host'];
         $port = $this->config['port'];
         $root = escapeshellarg($this->config['root']);
@@ -54,20 +54,20 @@ class Php extends Driver {
         passthru($command);
     }
 
-    public function restart(){
-
+    public function restart() {
+        echo 'This mode does not support.';
     }
 
-    public function stop(){
-
+    public function stop() {
+        echo 'This mode does not support.';
     }
 
-    public function status(){
-
+    public function status() {
+        echo 'This mode does not support.';
     }
 
-    public function reload(){
-
+    public function reload() {
+        echo 'This mode does not support.';
     }
 
 }

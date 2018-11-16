@@ -21,6 +21,9 @@ use Countable;
  * @since 2.0
  * @author: collin <collin@nb.cx>
  * @date: 2017/12/30
+ *
+ * @property  boolean empty
+ * @property  boolean have
  */
 class Collection extends Access implements Iterator, JsonSerializable, Countable {
 
@@ -50,7 +53,7 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
      * 是否为空
      * @return bool
      */
-    public function _isEmpty() {
+    protected function _empty() {
         return empty($this->stack);
     }
 
@@ -58,8 +61,8 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
      * 是否不为空
      * @return bool
      */
-    public function _isHave() {
-        return !$this->isEmpty;
+    protected function _have() {
+        return !$this->empty;
     }
 
 
@@ -69,6 +72,15 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
      */
     public function stack() {
         return $this->stack;
+    }
+
+
+    /**
+     * 返回将已经缓存的数据覆盖堆栈原始数据
+     * @return array
+     */
+    public function mingle() {
+        return array_merge($this->stack,$this->tmp);
     }
 
     /**
@@ -91,7 +103,6 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
     public function reverse() {
         $this->stack = array_reverse($this->stack);
         return $this;
-        //return new static(array_reverse($this->_stack));
     }
 
     /**
@@ -254,6 +265,23 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
         return array_map(function ($value) {
             return ($value instanceof self) ? $value->toArray() : $value;
         }, $data);
+    }
+
+    /**
+     * 获取原始数据
+     * @param $name
+     * @return mixed|null
+     */
+    public function raw($name) {
+        // TODO: Implement __get() method.
+        if (isset($this->row[$name])) { //array_key_exists($name, $this->_row)
+            return  $this->row[$name];
+        }
+        if(isset($this->stack[$name])){
+            $this->row = &$this->stack;
+            return $this->row[$name];
+        }
+        return null;
     }
 
     /**

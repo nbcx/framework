@@ -10,6 +10,7 @@
 namespace nb\debug;
 
 use nb\Config;
+use nb\Debug;
 
 /**
  * Driver
@@ -22,18 +23,36 @@ use nb\Config;
  */
 abstract class Driver {
 
+    protected $record;
+
 	/**
 	 * @return Debug
 	 */
-	abstract public function start($synchronous = true);
+	abstract public function start();
 
-	/**
-	 *
-	 * @param $type
-	 * @param $key
-	 * @param $val
-	 */
-    abstract public function record($type,$parama,$paramb=null);
+    /**
+     *
+     * @param $type
+     * @param $key
+     * @param $val
+     */
+    public function record($type,$parama,$paramb=null){
+        switch($type) {
+            case 1:
+                if(is_object($paramb)) {
+                    $paramb = '<pre>'.print_r($paramb,true).'<pre/>';
+                }
+                $this->record['log'][] = ['k'=>$parama,'v'=>$paramb];
+                break;
+            case 2:
+                $parama = Debug::e2Array($parama);
+                $this->record['e'][] = $parama;
+                break;
+            case 3:
+                $this->record['sql'][] = ['sql'=>$parama,'param'=>$paramb];
+                break;
+        }
+    }
 
 	/**
 	 * 统计信息，存入Bug
@@ -64,6 +83,28 @@ abstract class Driver {
             throw new \Exception('Create bug dir is fail!');
         }
         file_put_contents($bpath.'debug.log', json_encode($log));
+    }
+
+
+    /**
+     * 对终端友好的变量输出
+     * @access public
+     * @param  mixed         $var 变量
+     * @param  boolean       $detailed 是否详细输出 默认为true 如果为false 则使用print_r输出
+     * @param  string        $label 标签 默认为空
+     * @param  integer       $flags htmlspecialchars flags
+     * @return void|string
+     */
+    public static function ex($var, $detailed = false) {
+        if (is_object($var)) { //$var instanceof \nb\Collection
+            $detailed = false;
+        }
+        ob_start();
+        $detailed?var_dump($var):print_r($var);
+        $output = ob_get_clean();
+        $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
+        $output = '<pre>'  . $output . '</pre>';
+        echo $output;
     }
 
     /**

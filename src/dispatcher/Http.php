@@ -47,21 +47,18 @@ class Http extends Php {
      * @throws \ReflectionException
      */
     private function doWith() {
-        //路由解析前的回调函数
-        //可以重定路由，可以修改路由配置等
-        Pool::object('nb\\event\\Framework')->redirect();
-
         //判断是否为模块绑定
         $module = Config::$o->module_bind;
-        if($module && isset($module[$host = Request::ins()->host])) {
+        $router = Router::driver();
+        if($module && isset($module[$host = Request::driver()->host])) {
             $this->module($module[$host]);
-            $router = Router::ins();
+            $router = $router;
             $router->module = $module[$host];
             $router->mustAnalyse();
         }
         else {
             //判断是否为绑定模块
-            $router = Router::ins()->mustAnalyse();
+            $router->mustAnalyse();
             //如果访问的模块，加载模块配置
             if($router->module) {
                 $this->module($router->module);
@@ -101,7 +98,7 @@ class Http extends Php {
             return false;
         }
 
-        $ext = Request::ins()->ext;
+        $ext = Request::driver()->ext;
         if(!$ext || false === strpos($conf['allow'], $ext)) {
             return false;
         }
@@ -139,8 +136,6 @@ class Http extends Php {
 
 
     protected function module($module) {
-        //return true;
-
         $conf = Config::$o;
         $conf_file = __APP__.$conf->folder_module.DS.$module.DS.'config.inc.php';
 
@@ -161,11 +156,9 @@ class Http extends Php {
 
             foreach ($config as $k=>$v) {
                 $conf->$k = $v;
-                //Config::setx($k,$v);
             }
         }
         else {
-            //$conf->view['view_path'] = __APP__.$conf->module.DS.$module.DS.'view'.DS;
             $conf->import(
                 [__APP__.$conf->folder_module.DS.$module.DS.'include'.DS],
                 $conf->path_autoext

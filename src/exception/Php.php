@@ -11,6 +11,8 @@ namespace nb\exception;
 
 
 use nb\Config;
+use nb\I18n;
+use nb\Router;
 
 /**
  * 处理php-fpm模式下的异常
@@ -31,6 +33,40 @@ class Php extends Driver {
             }
             include __DIR__ . DS . 'html' . DS . 'exception.tpl.php';
         }
+    }
+
+    /**
+     * 当访问不存在的控制器或方法时，将回调此方法
+     *
+     * @param Router $router
+     * @throws \Exception
+     */
+    public function notfound() {
+        $router = Router::driver();
+        if (isset($this->call['notfound']) && !call_user_func($this->call['notfound'], $router)) {
+            return;
+        }
+        if(ob_get_level() > 0) {
+            ob_clean();
+        }
+        //if (!headers_sent()) {
+        //    header('HTTP/1.1 404 Not Found');
+        //    header('Status:404 Not Found');
+        //}
+        //if (f('ajax')) {
+        //    Config::$o->debug and quit('Ajax Not Found:' . $router->getModel(). '/' . $router->getController() . '/' . $router->getFunction());
+        //    quit('404 page not found url!');
+        //}
+        if (Config::$o->debug) {
+            $hint = I18n::t('请求无法应答！');
+            $message = I18n::t('请检查下面路由信息是否正确！ %s%s%s%s',[
+                '<br/>module : '.$router->module,
+                '<br/>folder : '.$router->folder,
+                '<br/>controller : '.$router->controller,
+                '<br/>function : '.$router->function
+            ]);
+        }
+        include __DIR__ . DS . 'html' . DS . 'hint.tpl.php';
     }
 
 }

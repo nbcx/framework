@@ -24,6 +24,10 @@ abstract class Swoole extends Driver {
 
     protected $swoole;
 
+    protected $options = [];
+
+    protected $callback;
+
     public function __construct($options=[]) {
         $this->options = array_merge($this->options,$options);
         $register = get_class_methods($this->options['register']);
@@ -66,48 +70,38 @@ abstract class Swoole extends Driver {
     }
 
     public function stop() {
-        $conf = Config::$o->server;
         if (!$pid = $this->getpid()) {
-            echo "Swoole {$conf['driver']} server not run\n";
+            echo "Swoole {$this->options['driver']} server not run\n";
             exit(1);
         }
         posix_kill($pid, SIGTERM);
-        echo "swoole {$conf['driver']} server stoped\n";
+        echo "swoole {$this->options['driver']} server stoped\n";
     }
 
     public function status() {
-        $conf = Config::$o->server;
         if ($pid = $this->getpid()) {
-            echo sprintf("swoole {$conf['driver']} server run at pid %d \n", $pid);
+            echo sprintf("swoole {$this->options['driver']} server run at pid %d \n", $pid);
         }
         else {
-            echo "swoole {$conf['driver']} server not run\n";
+            echo "swoole {$this->options['driver']} server not run\n";
         }
     }
 
     public function reload() {
-        $conf = Config::$o->server;
         if (!$pid = $this->getpid()) {
-            echo "swoole {$conf['driver']} server not run\n";
+            echo "swoole {$this->options['driver']} server not run\n";
             exit(1);
         }
         posix_kill($pid, SIGUSR1);
-        echo "swoole {$conf['driver']} server reloaded\n";
+        echo "swoole {$this->options['driver']} server reloaded\n";
     }
 
     public function getpid() {
-        $pid_file = '/tmp/swoole.pid';
-        $enable_pid = Config::getx('swoole.enable_pid');
-        if ($enable_pid) {
-            $pid_file = $enable_pid;
-        }
-        $pid = file_exists($pid_file) ? file_get_contents($pid_file) : 0;
+        $enable_pid = $this->options['enable_pid'];
+        $pid = file_exists($enable_pid) ? file_get_contents($enable_pid) : 0;
         // 检查进程是否真正存在
         if ($pid && !posix_kill($pid, 0)) {
-            $errno = posix_get_last_error();
-            if ($errno === 3) {
-                $pid = 0;
-            }
+            posix_get_last_error() === 3 and $pid = 0;
         }
         return $pid;
     }
@@ -156,6 +150,44 @@ abstract class Swoole extends Driver {
     public function __get($name) {
         // TODO: Implement __get() method.
         return $this->swoole->$name;
+    }
+
+    /**
+     * Server启动在主进程的主线程回调此函数
+     * 在此事件之前Swoole Server已进行了如下操作
+     *   已创建了manager进程
+     *   已创建了worker子进程
+     *   已监听所有TCP/UDP端口
+     *   已监听了定时器
+     * onStart回调中，仅允许echo、打印Log、修改进程名称。不得执行其他操作。
+     * onWorkerStart和onStart回调是在不同进程中并行执行的，不存在先后顺序。
+     * @param \swoole\server $server
+     */
+    public function __start(\swoole\Server $server) {
+        $pid = posix_getpid();
+        file_put_contents($this->options['enable_pid'], $pid);
+
+        if(method_exists($this->callback,'start')) {
+            $this->callback->start($server);
+        }
+    }
+
+    /**
+     * 当服务关闭时触发
+     * 在此之前Swoole Server已进行了如下操作
+     *   已关闭所有线程
+     *   已关闭所有worker进程
+     *   已close所有TCP/UDP监听端口
+     *   已关闭主Rector
+     * @param swoole_server $server
+     */
+    public function __shutdown(\swoole\Server $server) {
+        $path = $this->options['enable_pid'];
+        file_exists($path) and unlink($path);
+
+        if(method_exists($this->callback,'shutdown')) {
+            $this->callback->shutdown($server);
+        }
     }
 
 }

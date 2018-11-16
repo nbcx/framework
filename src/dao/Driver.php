@@ -94,7 +94,7 @@ abstract class Driver extends Access {
 
         $this->alias = $tableAlias;
         $this->name = $tableName;
-        $this->prefix = $server['prefix'];
+        $this->prefix = $this->server['prefix'];
         $this->table = $this->prefix.$tableName;
     }
 
@@ -1074,11 +1074,18 @@ abstract class Driver extends Access {
     }
 
     protected function _data($data) {
+        if($this->object) {
+            $object = $this->object;
+            return new $object(is_array($data)?$data:[]);
+        }
+        return $data;
+        /*
         if($data && is_array($data) && $this->object) {
             $object = $this->object;
             return new $object($data);
         }
         return $data;
+        */
     }
 
     /**

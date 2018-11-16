@@ -10,6 +10,7 @@
 namespace nb\event;
 
 use nb\Config;
+use nb\Exception;
 use nb\I18n;
 use nb\Router;
 
@@ -39,36 +40,8 @@ class Framework {
      * @throws \Exception
      */
     public function notfound() {
-        $router = Router::driver();
-        if (Config::$o->sapi == 'cli') {
-            die('Cli Not Found:' .  $router->module. '/' .$router->controller . '/' . $router->function."\n");
-        }
-        if (isset($this->call['notfound']) && !call_user_func($this->call['notfound'], $router)) {
-            return;
-        }
-        if(ob_get_level() > 0) {
-            ob_clean();
-        }
-        //if (!headers_sent()) {
-        //    header('HTTP/1.1 404 Not Found');
-        //    header('Status:404 Not Found');
-        //}
-        //if (f('ajax')) {
-        //    Config::$o->debug and quit('Ajax Not Found:' . $router->getModel(). '/' . $router->getController() . '/' . $router->getFunction());
-        //    quit('404 page not found url!');
-        //}
-        if (Config::$o->debug) {
-            $hint = I18n::t('请求无法应答！');
-            $message = I18n::t('请检查下面路由信息是否正确！ %s%s%s%s',[
-                '<br/>module : '.$router->module,
-                '<br/>folder : '.$router->folder,
-                '<br/>controller : '.$router->controller,
-                '<br/>function : '.$router->function
-            ]);
-        }
-        include __DIR__ . DS . 'html' . DS . 'hint.tpl.php';
+        Exception::driver()->notfound();
     }
-
 
     /**
      * 当程序运行遇到错误，都会回调此方法
@@ -80,29 +53,6 @@ class Framework {
      */
     public function error($e,$deadly = false) {
         return true;
-        if (Config::$o->debug) {
-            if ($deadly) {
-                if (Config::$o->sapi=='cli') {
-                    echo "\n:( Have Error\n";
-                    echo "CODE: {$e->getCode()} \n";
-                    echo "FILE: {$e->getFile()} \n";
-                    echo "LINE: {$e->getLine()}\n";
-                    echo "DESC: {$e->getMessage()}\n\n";
-                }
-                else {
-                    echo "\n:( Swoole Error\n";
-                    echo "CODE: {$e->getCode()} \n";
-                    echo "FILE: {$e->getFile()} \n";
-                    echo "LINE: {$e->getLine()}\n";
-                    echo "DESC: {$e->getMessage()}\n\n";
-                    return;
-                    if(ob_get_level() > 0) {
-                        ob_clean();
-                    }
-                    include __NB__ . 'templet' . DS . 'exception.tbl.php';
-                }
-            }
-        }
     }
 
     /**
@@ -126,12 +76,6 @@ class Framework {
         include __DIR__ . DS.'html'. DS.'hint.tpl.php';
         quit();
     }
-
-    /**
-     * 在路由解析前，会执行此方法，方便自定义一些特殊路由
-     * @param Router $router
-     */
-    public function redirect() {}
 
     /**
      * 此方法会在debug开始写记录文件时调用。
@@ -196,5 +140,17 @@ class Framework {
         unset($data['action']);
         return $action;
     }
+
+    /**
+     * 在Router驱动对象构造时，会执行此方法，方便自定义一些特殊路由
+     * @param Router $router
+     */
+    public function router(\nb\router\Driver $router) {}
+
+
+    /**
+     * 在Request驱动对象构造时，将执行此函数
+     */
+    public function request(\nb\request\Driver $request) { }
 
 }

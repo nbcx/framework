@@ -4,7 +4,7 @@
 <head>
     <meta charset="utf-8"/>
 
-    <title>Exception-[<?=\nb\Request::ins()->host?>]</title>
+    <title>Exception-[<?=\nb\Request::driver()->host?>]</title>
     <style type="text/css">
         /* reset */
         html,body,div,span,h1,h2,h3,h4,h5,h6,p,pre,a,code,em,img,strong,b,i,ul,li{

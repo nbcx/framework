@@ -11,6 +11,7 @@ namespace nb\router;
 
 use nb\Config;
 use nb\Pool;
+use nb\Request;
 
 /**
  * Command
@@ -20,7 +21,7 @@ use nb\Pool;
  * @author: collin <collin@nb.cx>
  * @date: 2018/8/7
  */
-class Websocket extends Driver {
+class Base extends Driver {
 
     /**
      * 当前路由名称
@@ -31,11 +32,7 @@ class Websocket extends Driver {
     public $current;
 
     public function _pathinfo() {
-        $url = Config::$o->argv;
-        if(isset($url[1])) {
-            return $url[1];
-        }
-        return '';
+        return Request::driver()->pathinfo;
     }
 
     /**

@@ -17,7 +17,7 @@ use nb\Session;
 use nb\Pool;
 
 /**
- * Native
+ * Php
  *
  * @package nb\debug
  * @link https://nb.cx
@@ -113,33 +113,13 @@ class Php extends Driver {
 	/**
 	 * @return Debug
 	 */
-	public function start($synchronous = true){
+	public function start(){
         $this->record['mem'] =  array_sum(explode(' ',memory_get_usage()));
         $this->record['sql'] = [];
         $this->record['exception'] = [];
         $this->record['log'] = [];
 	}
 
-	/**
-	 *
-	 * @param $type
-	 * @param $key
-	 * @param $val
-	 */
-	public function record($type,$parama,$paramb=null){
-        switch($type) {
-            case 1:
-                $this->record['log'][] = ['k'=>$parama,'v'=>$paramb];
-                break;
-            case 2:
-                $parama = \nb\Debug::e2Array($parama);
-                $this->record['e'][] = $parama;
-                break;
-            case 3:
-                $this->record['sql'][] = ['sql'=>$parama,'param'=>$paramb];
-                break;
-        }
-	}
 
 	/**
 	 * 统计信息，存入Bug
@@ -239,5 +219,6 @@ class Php extends Driver {
         }
 		include __DIR__.DS.'html'.DS.'trace.tpl.php';
 	}
+
 
 }

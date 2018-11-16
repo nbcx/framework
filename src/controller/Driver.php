@@ -1,4 +1,5 @@
 <?php
+
 /*
  * This file is part of the NB Framework package.
  *
@@ -7,30 +8,28 @@
  * For the full copyright and license information, please view the LICENSE
  * file that was distributed with this source code.
  */
-namespace nb\request;
 
+namespace nb\controller;
 use nb\Access;
-use nb\Pool;
+use nb\Controller;
 
 /**
  * Driver
  *
- * @package nb\request
+ * @package nb\controller
  * @link https://nb.cx
- * @since 2.0
  * @author: collin <collin@nb.cx>
- * @date: 2017/11/28
+ * @date: 2018/10/15
  */
 abstract class Driver extends Access {
 
-    /*
-    protected $get;
-    protected $post;
-    protected $request;
-    protected $cookie;
-    protected $files;
-    protected $server;
-    protected $input;
-    */
+    /**
+     * @var Controller
+     */
+    protected $controller;
+
+    public function __construct(Controller $nb) {
+        $this->controller = $nb;
+    }
 
 }

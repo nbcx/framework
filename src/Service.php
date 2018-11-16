@@ -24,21 +24,17 @@ class Service {
 
     //业务执行状态码
     public $code = 0;
-
-    //业务成功信息
-    public $success;
-
-    //业务失败数据
-    public $fail;
+    public $msg;
+    public $data;
 
     protected $on = [];
 
     protected $controller;
 
     //默认回调成功还是失败
-    protected $defaultCall = 'success';
+    protected $defaultCall = 'fail';
 
-    public function __construct(Controller $controller) {
+    public function __construct($controller) {
         $this->controller = $controller;
     }
 
@@ -88,7 +84,6 @@ class Service {
      * @throws \ReflectionException
      */
     public static function trigger($condition=true,...$params) {
-
         //$this->middle(false);
         if ($condition == false) {
             return false;
@@ -98,24 +93,20 @@ class Service {
     }
 
     public static function withTrigger($condition=true,...$params) {
-
         //$this->middle(false);
         if ($condition == false) {
             return false;
         }
-
         return call_user_func_array([get_called_class(),'withRun'],$params);
     }
 
-
     protected function with($function,$params=[]) {
         $this->status = call_user_func_array([$this,$function],$params);
-
-        if($this->status && isset($this->on['success'])) {
-            call_user_func($this->on['success'],$this->success);
+        if($this->status) {
+            isset($this->on['success']) and call_user_func($this->on['success'],$this->msg,$this->data,$this->code);
         }
-        else if(isset($that->on['fail'])) {
-            call_user_func($this->on['fail'],$this->fail);
+        else {
+            isset($this->on['fail']) and call_user_func($this->on['fail'],$this->msg,$this->code,$this->data);
         }
         return $this;
     }
@@ -173,7 +164,7 @@ class Service {
      */
     public function success($callback) {
         if($this->status) {
-            return $callback($this->success);
+            return $callback($this);
         }
         return $this;
     }
@@ -184,7 +175,7 @@ class Service {
      */
     public function fail($callback) {
         if($this->status == false) {
-            return $callback($this->fail);//call_user_func_array($callback,);//
+            return $callback($this);//call_user_func_array($callback,);//
         }
         return $this;
     }

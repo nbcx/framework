@@ -12,8 +12,6 @@
 define('DS'        ,DIRECTORY_SEPARATOR);
 define('__NB__'    ,__DIR__.DS);
 define('__APP__'   ,_APP_.DS);
-define('__VER__'   ,'2.0.1');//版本号
-define('__PHASE__' ,'alpha');//阶段
 
 $_ENV['argv'] = isset($argv)?$argv:'';
 spl_autoload_register(function($object) {

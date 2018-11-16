@@ -20,13 +20,6 @@ namespace nb;
  */
 class Router extends Component {
 
-    /**
-     * @return \nb\router\Driver
-     */
-    public static function ins() {
-        return self::driver();
-    }
-
     public static function config() {
         // TODO: Implement config() method.
         if(Config::$o->sapi=='cli') {

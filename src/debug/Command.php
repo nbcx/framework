@@ -25,15 +25,13 @@ use nb\Pool;
  */
 class Command extends Driver {
 
-	private $show = [];
+    protected $show = [];
 	private $key;
 	private $ip;
-	private $n = 10;
+    protected $n = 10;
 	private $page = false;
 
-	private $record;
-
-	private $startd = false;
+	protected $startd = false;
 
     public function __construct() {
         $config = Config::getx('debug');
@@ -72,7 +70,7 @@ class Command extends Driver {
 	/**
 	 * @return Debug
 	 */
-	public function start($synchronous = true){
+	public function start(){
         $this->record['mem'] =  array_sum(explode(' ',memory_get_usage()));
         $this->record['start'] = time();
         $this->record['spend'] = microtime(true);
@@ -86,32 +84,11 @@ class Command extends Driver {
 
 
 	/**
-	 *
-	 * @param $type
-	 * @param $key
-	 * @param $val
-	 */
-	public function record($type,$parama,$paramb=null){
-        switch($type) {
-            case 1:
-                $this->record['log'][] = ['k'=>$parama,'v'=>$paramb];
-                break;
-            case 2:
-                $parama = Debug::e2Array($parama);
-                $this->record['e'][] = $parama;
-                break;
-            case 3:
-                $this->record['sql'][] = ['sql'=>$parama,'param'=>$paramb];
-                break;
-        }
-	}
-
-	/**
 	 * 统计信息，存入Bug
 	 */
 	public function end(){
         //如果请求的控制器是debug就算了！
-        if (Router::ins()->controller == 'debug') {
+        if (Router::driver()->controller == 'debug') {
             return false;
         }
 
@@ -147,5 +124,28 @@ class Command extends Driver {
 
 
 
+    /**
+     * 对终端友好的变量输出
+     * @access public
+     * @param  mixed         $var 变量
+     * @param  boolean       $detailed 是否详细输出 默认为true 如果为false 则使用print_r输出
+     * @param  string        $label 标签 默认为空
+     * @param  integer       $flags htmlspecialchars flags
+     * @return void|string
+     */
+    public static function ex($var, $detailed = false) {//, $label = null, $flags = ENT_SUBSTITUTE
+        //$label = (null === $label) ? '' : rtrim($label) . ':';
+
+        if (is_object($var)) { //$var instanceof \nb\Collection
+            $detailed = false;
+        }
+        echo PHP_EOL;
+        //ob_start();
+        $detailed?var_dump($var):print_r($var);
+        //$output = ob_get_clean();
+        //$output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
+        echo PHP_EOL;
+        //echo PHP_EOL . $label . $output . PHP_EOL;
+    }
 
 }

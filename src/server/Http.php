@@ -44,8 +44,8 @@ class Http extends Swoole {
 
     //支持的回调函数
     protected $call = [
-        'start',
-        'shutdown',
+        //'start',
+        //'shutdown',
         'workerStart',
         'workerStop',
         'workerExit',
@@ -74,21 +74,25 @@ class Http extends Swoole {
         );
         $server->set($this->options);
 
-        //设置server回调事件
-        $server->on('request',    [$this,'request']);
+        //注册server启动和结束回调
+        $server->on('start', [$this,'__start']);
+        $server->on('shutdown', [$this,'__shutdown']);
+
+        //设置httpserver数据请求回调事件
+        $server->on('request', [$this,'request']);
+
         $callback = new $this->options['register']();
         foreach ($this->call as  $v) {
             $server->on($v,[$callback,$v]);
         }
-
         $this->swoole = $server;
         $server->start();
     }
 
     public function request(\swoole\http\Request $request, \swoole\http\Response $response) {
         try {
-            Config::$o->sapi='http';
             ob_start();
+            Config::$o->sapi='http';
             Pool::destroy();
             Pool::set('\swoole\http\Request', $request);
             Pool::set('\swoole\http\Response',$response);

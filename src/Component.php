@@ -19,12 +19,11 @@ namespace nb;
  */
 abstract class Component {
 
-    protected $driver;
+    public $driver;
 
     public function __construct() {
         $args = func_get_args();
         $args[] = static::config();
-        //array_unshift($args,static::config());
         $this->driver =  call_user_func_array(
             'static::create',
             $args
@@ -48,7 +47,7 @@ abstract class Component {
      * 获取驱动对象，以单列的模式保存在对象池里
      * @return driver
      */
-    public static function driver(){
+    public static function driver() {
         $key = get_called_class();
         if($driver = Pool::get($key)) {
             return $driver;
@@ -128,11 +127,7 @@ abstract class Component {
      */
     public static function __callStatic($method, $arguments) {
         // TODO: Implement __callStatic() method.
-        $that = static::driver();
-        if (method_exists($that, $method)) {
-            return call_user_func_array([$that,$method],$arguments);
-        }
-        return null;
+        return call_user_func_array([static::driver(),$method],$arguments);
     }
 
     public function __call($name, $arguments) {

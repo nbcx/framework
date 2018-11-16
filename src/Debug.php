@@ -127,26 +127,8 @@ class Debug extends Component {
      */
     public static function ex($var, $detailed = false, $label = null, $flags = ENT_SUBSTITUTE) {
         if(!Config::$o->debug) return;
-        $label = (null === $label) ? '' : rtrim($label) . ':';
 
-        if (is_object($var)) { //$var instanceof \nb\Collection
-            $detailed = false;
-        }
-        ob_start();
-        $detailed?var_dump($var):print_r($var);
-        $output = ob_get_clean();
-        $output = preg_replace('/\]\=\>\n(\s+)/m', '] => ', $output);
-
-        if (Config::$o->sapi == 'cli') {
-            $output = PHP_EOL . $label . $output . PHP_EOL;
-        }
-        else {
-            if (!extension_loaded('xdebug')) {
-                $output = htmlspecialchars($output, $flags);
-            }
-            $output = '<pre>' . $label . $output . '</pre>';
-        }
-        echo $output;
+        self::driver()->ex($var, $detailed, $label, $flags);
     }
 
     /**
@@ -204,4 +186,21 @@ class Debug extends Component {
     }
 
 
+    /**
+     * 优化调试变量显示
+     * @param $var
+     */
+    public static function optimize($var) {
+        if(!$var) {
+            self::e($var);
+        }
+        else {
+            if(is_string($var)){
+                echo $var;
+            }
+            else {
+                self::ex($var);
+            }
+        }
+    }
 }

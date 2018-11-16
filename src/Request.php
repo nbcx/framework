@@ -20,18 +20,32 @@ namespace nb;
  */
 class Request extends Component {
 
-    /**
-     * @var \nb\request\Driver
-     */
-    public static function ins() {
-        return self::driver();
-    }
-
     public static function config() {
         if(isset(Config::$o->request)) {
             return Config::$o->request;
         }
         return null;
+    }
+
+    /**
+     * 获取驱动对象，以单列的模式保存在对象池里
+     * @return driver
+     */
+    public static function driver() {
+        $key = get_called_class();
+        if($driver = Pool::get($key)) {
+            return $driver;
+        }
+        $args = func_get_args();
+        $config = static::config();
+        $config and array_unshift($args,$config);
+        $class =  call_user_func_array(
+            'static::create',
+            $args
+        );
+        $request = Pool::set($key,$class);
+        Pool::object('nb\event\Framework')->request($request);
+        return $request;
     }
 
     /**
@@ -64,39 +78,8 @@ class Request extends Component {
      * @param array ...$args
      * @return array|mixed|null
      */
-    public static function input($arg,...$args){
-        /** $args != null */
-        if($args) {
-            if(is_array($args[0])) {
-                //$this->input('get',['name','pass']);
-                $args = $args[0];
-                $method = $arg;
-            }
-            else {
-                //$this->input('name','pass');
-                array_unshift($args,$arg);
-                $method = 'request';
-            }
-        }
-        else {
-            /** $args == null */
-            //$this->input('name');
-            //$this->input(['name','pass']);
-            $args = [$arg];
-            $method = 'request';
-        }
-
-        $input = self::form($method,$args);
-
-        if(is_array($input) === false) {
-            return null;
-        }
-
-        if(count($input) == 1) {
-            return current($input);
-        }
-
-        return array_values($input);
+    public static function input(...$args){
+        return call_user_func_array([self::driver(),'input'],$args);
     }
 
 }
