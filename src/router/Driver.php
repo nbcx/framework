@@ -34,6 +34,8 @@ abstract class Driver extends Access {
      * @var folder
      */
 
+    protected $config;
+
     /**
      * 路由驱动构造函数
      *
@@ -41,10 +43,31 @@ abstract class Driver extends Access {
      * @throws \ReflectionException
      */
     public function __construct($config=[]) {
+        $this->config = array_merge($this->config, $config);
+
         //路由解析前的回调函数
         //可以重定路由，可以修改路由配置等
         Pool::object('nb\\event\\Framework')->router($this);
-        $this->config = $config;
+    }
+
+    /**
+     * 动态修改组件配置和获取对应配置
+     *
+     * @access public
+     * @param array|string $config
+     * @return string|void|array
+     */
+    public function config($config) {
+
+        if (is_array($config)) {
+            $this->config = array_merge($this->config, $config);
+        }
+        elseif (isset($this->config[$config])) {
+            return $this->config[$config];
+        }
+        else {
+            return;
+        }
     }
 
     /**
