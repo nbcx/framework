@@ -34,7 +34,7 @@ abstract class Driver extends Access {
      * @var folder
      */
 
-    protected $config;
+    protected $config=[];
 
     /**
      * 路由驱动构造函数
