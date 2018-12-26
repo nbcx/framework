@@ -22,6 +22,12 @@ use nb\Pool;
  */
 class Sqlite extends Driver {
 
+    protected $server = [
+        'user' 		=> null,
+        'pass' 		=> null,
+        'object'    => false,
+    ];
+
     /**
      * 根据参数$option初始化PDO
      * @var Pdo
@@ -30,8 +36,6 @@ class Sqlite extends Driver {
         $server = $this->server;
 
         $dsn = "{$server['driver']}:{$server['dbname']}";
-        $server['user'] = isset($server['user'])?:null;
-        $server['pass'] = isset($server['pass'])?:null;
 
         return Pool::object($dsn,'\\PDO',[
             $dsn,$server['user'],$server['pass']

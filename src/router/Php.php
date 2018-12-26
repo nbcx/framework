@@ -32,15 +32,12 @@ class Php extends Driver {
      */
     public $current;
 
-    /**
-     * 已经解析完毕的路由表配置
-     *
-     * @access private
-     * @var mixed
-     */
-    //public  $routingTable = [];
-
-    //private $_routes;
+    //组件默认配置
+    protected $config = [
+        'name'=>'default', //路由名称，影响路由缓存文件的命名
+        'default'=>false,//是否关闭默认路由，true 是，false 不关闭
+        'match'=>[]
+    ];
 
 
     /**
@@ -175,7 +172,9 @@ class Php extends Driver {
 
         $module = $this->module;
 
-        $file = Config::$o->path_temp.$module.'_router.php';
+        $name = $module.'-router-'.$this->config['name'];
+
+        $file = Config::$o->path_temp.$name;
 
         //如果存在路由缓存
         if( is_file($file) ) {
@@ -187,7 +186,7 @@ class Php extends Driver {
             $parser = new Parser($this->routes);
             $routingTable = $parser->parse();
             /** 缓存路由 */
-            efile($routingTable,$module.'_router');
+            efile($routingTable,$name);
             return $routingTable;
         }
     }
