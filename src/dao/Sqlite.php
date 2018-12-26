@@ -36,8 +36,6 @@ class Sqlite extends Driver {
         $server = $this->server;
 
         $dsn = "{$server['driver']}:{$server['dbname']}";
-        //$server['user'] = isset($server['user'])?:null;
-        //$server['pass'] = isset($server['pass'])?:null;
 
         return Pool::object($dsn,'\\PDO',[
             $dsn,$server['user'],$server['pass']
