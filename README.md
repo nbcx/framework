@@ -171,7 +171,7 @@ NB Framework的开源协议为apache 2.0，详情参见LICENSE。
 - 项目官网主页：[https://nb.cx](https://nb.cx)
 - 文档维护地址：[https://wiki.nb.cx](https://wiki.nb.cx) 
 
-欢迎各位老铁进群一起写代码！
+欢迎各位老铁进群一起写代码。如果感兴趣，也请帮点个star吧！
 
     
     
