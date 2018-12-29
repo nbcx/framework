@@ -99,7 +99,7 @@ server {
     }
 }
 ```
-5.重启nginx，再浏览器访问`demo.ol.cx`,输出`Welcome to use NB Framework`则表示成功
+5.重启nginx，在浏览器访问`demo.ol.cx`,输出`Welcome to use NB Framework`则表示成功
 
 ### 使用Swoole启动应用,确保swoole已经安装成功！
 1.再上面的目录下添加如下结构
@@ -130,6 +130,8 @@ include ('../nb/boot.php');
 ```php
 <?php
 return [
+    'debug' => true,
+    
     'server' => [
         'driver'=>'http',
         'host'=>'0.0.0.0',
@@ -152,11 +154,14 @@ return [
 # 如果你的php命令已经加入系统环境里了，可以直接如下执行
 ./server start
 
-# 如果没有再系统环境里，则需要使用完整的php路径来执行，如下，注意使用自己的路径
+# 如果没有再系统环境里，则需要使用完整的php命令路径来执行，如下，注意使用自己的路径
 /usr/bin/php server start
 ```
 
 5.看控制台输出，并浏览器访问`127.0.0.1:9501`,输出`Welcome to use NB Framework`则表示成功.
+
+
+更多功能，可以查看[开发手册](https://wiki.nb.cx) 。
 
 ## 协议
 NB Framework的开源协议为apache 2.0，详情参见LICENSE。
