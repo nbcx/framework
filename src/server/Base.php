@@ -10,7 +10,7 @@
 namespace nb\server;
 
 /**
- * Php
+ * Base
  *
  * @package nb\server
  * @link https://nb.cx
@@ -18,7 +18,7 @@ namespace nb\server;
  * @author: collin <collin@nb.cx>
  * @date: 2017/11/28
  */
-class Php extends Driver {
+class Base extends Driver {
 
 
     protected $config = [
