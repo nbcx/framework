@@ -111,7 +111,7 @@ class Php extends Driver {
             /** $args == null */
             //$this->input('name');
             //$this->input(['name','pass']);
-            $args = [$this->_method,$arg];
+            $args = [$this->method,$arg];
         }
 
         $input = call_user_func_array([$this,'form'],$args);
