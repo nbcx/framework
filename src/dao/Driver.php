@@ -681,7 +681,9 @@ abstract class Driver extends Access {
         $groupby = '';
         if (!empty($this->group)) {
             $groupby = 'GROUP BY ' . $this->group;
-            if (!empty($this->having)) $groupby .= ' ' . $this->having;
+        }
+        if (!empty($this->having)) {
+            $groupby .= ' ' . $this->having;
         }
         $order = !empty($this->order) ? "ORDER BY $this->order" : '';
 
