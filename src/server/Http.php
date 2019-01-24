@@ -32,6 +32,8 @@ class Http extends Swoole {
         'register'=>'nb\\event\\Swoole',//注册一个类，来实现swoole自定义事件
         'host'=>'0.0.0.0',
         'port'=>9501,
+        'mode' => SWOOLE_PROCESS,
+        'sock_type' => SWOOLE_SOCK_TCP,
         'max_request'=>'',//worker进程的最大任务数
         'worker_num'=>'',//设置启动的worker进程数。
         'dispatch_mode'=>2,//据包分发策略,默认为2
@@ -67,11 +69,10 @@ class Http extends Swoole {
      * 启动Swoole服务
      */
     public function run() {
+        $opt = $this->options;
+
         //设置server参数
-        $server =  new \swoole\http\Server(
-            $this->options['host'],
-            $this->options['port']
-        );
+        $server =  new \swoole\http\Server($opt['host'], $opt['port'],$opt['mode'],$opt['sock_type']);
         $server->set($this->options);
 
         //注册server启动和结束回调

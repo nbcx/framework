@@ -261,7 +261,7 @@ class Collection extends Access implements Iterator, JsonSerializable, Countable
     }
 
     public function toArray() {
-        $data = $this->_stack?:$this->_row;
+        $data = $this->stack?:$this->row;
         return array_map(function ($value) {
             return ($value instanceof self) ? $value->toArray() : $value;
         }, $data);

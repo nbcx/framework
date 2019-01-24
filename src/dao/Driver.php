@@ -563,14 +563,15 @@ abstract class Driver extends Access {
      * 拼接in条件
      * @param $field 要过滤的字段
      * @param $filter 排除条件
-     * @param string $not
-     * 		eg: in('id',[1,2])  == id in(1,2)
-     * 			in('name',"'aa','bb','cc'")  == id in('aa','bb','cc')
-     * 			in('id',[1,2,3],'not')  == id not in(1,2,3)
+     * @param string $not true/fasle
+     * 		eg: in('id',[1,2])  ==> id in(1,2)
+     * 			in('name',"'aa','bb','cc'")  ==> id in('aa','bb','cc')
+     * 			in('id',[1,2,3],true)  ==> id not in(1,2,3)
      * @return Driver
      */
-    function in($field, $filter,$not = '') {
+    function in($field, $filter,$not = false) {
         if(!$filter) return $this;
+        $not = $not?'NOT':'';
         if(is_array($filter)){
             $comma = '';
             $setFields = '';
@@ -589,6 +590,45 @@ abstract class Driver extends Access {
         return $this;
     }
 
+    function orIn($field, $filter,$not = false) {
+        $this->w = ' OR ';
+        $this->in($field, $filter,$not);
+        return $this;
+    }
+
+    /**
+     * @param $field
+     * @param $min
+     * @param null $max
+     * @param bool $not
+     * eg: between('id',1,2)  ==> id between ? and ?, 1,2)
+     * 	   between('id','1 and 2')  ==> id between 1 and 2
+     * 	   between('id',1,2,true)  ==> id not between ? and ?, 1,2)
+     *     between('id','1 and 2',null,true)  ==> id not between 1 and 2
+     *
+     * @return $this
+     */
+    function between($field,$min,$max=null,$not=false) {
+        $not = $not?'NOT':'';
+        if($max !== null) {
+            $this->where .= $this->w . $field.' '.$not.' BETWEEN ? AND ?';
+            $this->params = array_merge($this->params,[
+                $min,$max
+            ]);
+        }
+        else {
+            $this->where .= $this->w . $field.' '.$not.' BETWEEN '.$min;
+        }
+        $this->w = ' AND ';
+        return $this;
+    }
+
+    function orBetween($field,$min,$max=null,$not=false) {
+        $this->w = ' OR ';
+        $this->between($field,$min,$max,$not);
+        return $this;
+    }
+
     /**
      * 拼接like条件
      * @param $field 要过滤的字段
@@ -600,7 +640,8 @@ abstract class Driver extends Access {
      * 			like('name','hello','a') ==  name like '%helo%'
      * @return Driver
      */
-    function like($field, $filter,$rl='a',$not = '') {
+    function like($field, $filter,$rl='a',$not = false) {
+        $not = $not?'NOT':'';
         switch($rl) {
             case 'n':
             default:
@@ -621,6 +662,12 @@ abstract class Driver extends Access {
                 break;
         }
         $this->w = ' AND ';
+        return $this;
+    }
+
+    function orLike($field, $filter,$rl='a',$not = false) {
+        $this->w = ' OR ';
+        $this->like($field, $filter, $rl, $not);
         return $this;
     }
 
@@ -681,7 +728,9 @@ abstract class Driver extends Access {
         $groupby = '';
         if (!empty($this->group)) {
             $groupby = 'GROUP BY ' . $this->group;
-            if (!empty($this->having)) $groupby .= ' ' . $this->having;
+        }
+        if (!empty($this->having)) {
+            $groupby .= ' ' . $this->having;
         }
         $order = !empty($this->order) ? "ORDER BY $this->order" : '';
 
