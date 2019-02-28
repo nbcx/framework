@@ -146,11 +146,14 @@ class Php extends Driver {
         $record['start'] = $request->requestTime;
         $record['url'] = 'http://'.$request->host.$request->uri;
         $record['get'] = $request->get;
+        $record['method'] = $request->method;
         $record['post'] = $request->post;
         $record['file'] = $request->files;
         $record['cookie'] = $request->cookie;
-        $record['method'] = $request->method;
         $record['ip'] = $request->ip;
+        if($record['method'] == 'POST' && empty($record['post'])) {
+            $record['input'] = $request->input;
+        }
         if(in_array('all',$this->show) || in_array('server',$this->show)){
             $record['server'] = $request->server;
         }
