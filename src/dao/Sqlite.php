@@ -26,6 +26,7 @@ class Sqlite extends Driver {
         'user' 		=> null,
         'pass' 		=> null,
         'object'    => false,
+        'prefix'    => '',
     ];
 
     /**
