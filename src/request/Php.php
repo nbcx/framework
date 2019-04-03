@@ -9,8 +9,6 @@
  */
 namespace nb\request;
 
-use nb\Pool;
-
 /**
  * Native
  *

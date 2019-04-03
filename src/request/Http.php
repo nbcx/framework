@@ -36,7 +36,7 @@ class Http extends Php {
     }
 
     public function _input() {
-        return $this->input;
+        return $this->req->rawContent();
     }
 
     public function _server() {
