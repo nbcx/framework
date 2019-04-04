@@ -94,7 +94,16 @@
                         <?php }?>
                     </table>
                 </div>
-            <?php }?>
+            <?php } ?>
+
+            <?php if(!empty($val['input'])) {?>
+                <h3 onclick="show('post-<?=$key?>')">Input</h3>
+                <div id="input-<?=$key?>">
+                    <table>
+                        <tr><td><?=$val['input'] ?></td></tr>
+                    </table>
+                </div>
+            <?php } ?>
 
             <?php if(!empty($val['file'])) {?>
                 <h3 onclick="show('file-<?=$key?>')">File</h3>

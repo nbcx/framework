@@ -69,12 +69,15 @@ class Http extends Php {
                 return;
             }
             $record['start'] = $request->requestTime;
+            $record['method'] = $request->method;
             $record['url'] = 'http://'.$request->host.$request->uri;
             $record['get'] = $request->get;
             $record['post'] = $request->post;
+            if($record['method'] == 'POST' && empty($record['post'])) {
+                $record['input'] = $request->input;
+            }
             $record['file'] = $request->files;
             $record['cookie'] = $request->cookie;
-            $record['method'] = $request->method;
             $record['ip'] = $request->ip;
             if(in_array('all',$this->show) || in_array('server',$this->show)){
                 $record['server'] = $request->server;
