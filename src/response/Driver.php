@@ -24,21 +24,32 @@ abstract class Driver extends Access {
     /**
      * @var array 资源类型
      */
-    protected $_mimeType = [
-        'xml' => 'application/xml,text/xml,application/x-xml',
+    protected  $mimeType = [
+        'bmp'  => 'image/bmp',
+        'ico'  => 'image/x-icon',
+        'gif'  => 'image/gif',
+        'png'  => 'image/png',
+        'bin'  => 'application/octet-stream',
+        'css'  => 'text/css',
+        'tar'  => 'application/x-tar',
+        'ppt'  => 'application/vnd.ms-powerpoint',
+        'pdf'  => 'application/pdf',
+        'swf'  => 'application/x-shockwave-flash',
+        'zip'  => 'application/x-zip-compressed',
+        'gzip' => 'application/gzip',
+        'woff' => 'application/x-woff',
+        'svg'  => 'image/svg+xml',
+        'xml'  => 'application/xml,text/xml,application/x-xml',
         'json' => 'application/json,text/x-json,application/jsonrequest,text/json',
-        'js' => 'text/javascript,application/javascript,application/x-javascript',
-        'css' => 'text/css',
-        'rss' => 'application/rss+xml',
+        'js'   => 'text/javascript,application/javascript,application/x-javascript',
+        'rss'  => 'application/rss+xml',
         'yaml' => 'application/x-yaml,text/yaml',
         'atom' => 'application/atom+xml',
-        'pdf' => 'application/pdf',
         'text' => 'text/plain',
-        'image' => 'image/png,image/jpg,image/jpeg,image/pjpeg,image/gif,image/webp,image/*',
-        'csv' => 'text/csv',
+        'jpg'  => 'image/jpg,image/jpeg,image/pjpeg',
+        'csv'  => 'text/csv',
         'html' => 'text/html,application/xhtml+xml,*/*',
     ];
-
 
     /**
      * http code
@@ -46,7 +57,7 @@ abstract class Driver extends Access {
      * @access private
      * @var array
      */
-    protected $_httpCode = [
+    protected $statusTexts = [
         100 => 'Continue',
         101 => 'Switching Protocols',
         200 => 'OK',
@@ -89,7 +100,33 @@ abstract class Driver extends Access {
         505 => 'HTTP Version Not Supported'
     ];
 
-    abstract public function header($key, $value=null,$http_response_code=null);
+    //abstract public function header($key, $value=null,$http_response_code=null);
+
+    /**
+     * @param int $statusCode
+     */
+    abstract public function code($statusCode, $text = null);
+
+    /**
+     * @param int $statusCode
+     * @param string $name
+     * @param string $description
+     * @param string $uri
+     * @return mixed
+     */
+    abstract public function error($statusCode, $name, $description = null, $uri = null);
+
+    /**
+     * @param int $statusCode
+     * @param string $url
+     * @param string $state
+     * @param string $error
+     * @param string $errorDescription
+     * @param string $errorUri
+     * @return mixed
+     */
+    abstract public function redirect($url, $statusCode, $state = null, $error = null, $errorDescription = null, $errorUri = null);
 
 
+    abstract public function send($format = 'json');
 }
