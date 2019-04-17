@@ -39,7 +39,7 @@ abstract class Driver extends Access {
         'gzip' => 'application/gzip',
         'woff' => 'application/x-woff',
         'svg'  => 'image/svg+xml',
-        'xml'  => 'application/xml,text/xml,application/x-xml',
+        'xml'  => 'application/xml,text/xml',
         'json' => 'application/json,text/x-json,application/jsonrequest,text/json',
         'js'   => 'text/javascript,application/javascript,application/x-javascript',
         'rss'  => 'application/rss+xml',

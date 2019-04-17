@@ -21,6 +21,11 @@ namespace nb\response;
 class Php extends Driver {
 
     /**
+     * @var string
+     */
+    public $version = '1.1';
+
+    /**
      * @var int
      */
     protected $statusCode = 200;
@@ -31,9 +36,9 @@ class Php extends Driver {
     protected $statusText;
 
     /**
-     * @var array
+     * @var string
      */
-    protected $parameters = [];
+    protected $body = '';
 
     /**
      * @var array
@@ -77,19 +82,24 @@ class Php extends Driver {
     public function code($statusCode, $text = null) {
         $this->statusCode = (int)$statusCode;
         if ($this->isInvalid()) {
-            throw new InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $statusCode));
+            throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $statusCode));
         }
 
         $this->statusText = false === $text ? '' : (null === $text ? $this->statusTexts[$this->statusCode] : $text);
+        return $this;
     }
 
     /**
-     * @param string $name
-     * @param mixed $value
+     * @return Boolean
+     *
+     * @api
+     *
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
      */
-    public function parameter($name, $value) {
-        $this->parameters[$name] = $value;
+    public function isInvalid() {
+        return $this->statusCode < 100 || $this->statusCode >= 600;
     }
+
 
     /**
      * @param string $name
@@ -104,48 +114,42 @@ class Php extends Driver {
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function body($format = 'json') {
-        switch ($format) {
-            case 'json':
-                return $this->parameters ? json_encode($this->parameters) : '';
-            case 'xml':
-                // this only works for single-level arrays
-                $xml = new \SimpleXMLElement('<response/>');
-                foreach ($this->parameters as $key => $param) {
-                    $xml->addChild($key, $param);
-                }
-
-                return $xml->asXML();
-        }
-
-        throw new InvalidArgumentException(sprintf('The format %s is not supported', $format));
-
+    public function body($content) {
+        $this->body = $content;
+        return $this;
     }
 
     /**
      * @param string $format
      */
-    public function send($format = 'json') {
+    public function send($format = 'html') {
         // headers have already been sent by the developer
         if (headers_sent()) {
             return;
         }
-
-        switch ($format) {
-            case 'json':
-                $this->header('Content-Type', 'application/json');
-                break;
-            case 'xml':
-                $this->header('Content-Type', 'text/xml');
-                break;
+        $this->header('Content-Type', $this->mimeType[$format]);
+        if(is_array($this->body)) {
+            switch ($format) {
+                case 'json':
+                    $this->body = json_encode($this->body);
+                    break;
+                case 'xml':
+                    $xml = new \SimpleXMLElement('<response/>');
+                    foreach ($this->body as $key => $param) {
+                        $xml->addChild($key, $param);
+                    }
+                    $this->body = $xml->asXML();
+                    break;
+            }
         }
         // status
         header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
 
         foreach ($this->httpHeaders as $name => $header) {
+            //ed(sprintf('%s: %s', $name, $header),$this->httpHeaders);
             header(sprintf('%s: %s', $name, $header));
         }
-        echo $this->body($format);
+        echo $this->body;
     }
 
     /**
@@ -170,17 +174,10 @@ class Php extends Driver {
             $parameters['error_uri'] = $errorUri;
         }
 
-        $httpHeaders = [
-            'Cache-Control' => 'no-store'
-        ];
-
-        $this->setStatusCode($statusCode);
-        $this->addParameters($parameters);
-        $this->addHttpHeaders($httpHeaders);
-
-        if (!$this->isClientError() && !$this->isServerError()) {
-            throw new InvalidArgumentException(sprintf('The HTTP status code is not an error ("%s" given).', $statusCode));
-        }
+        $this->code($statusCode);
+        $this->body($parameters);
+        $this->header('Cache-Control', 'no-store');
+        return $this;
     }
 
     /**
