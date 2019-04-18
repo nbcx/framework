@@ -125,7 +125,7 @@ abstract class Driver extends Access {
      * @param string $errorUri
      * @return mixed
      */
-    abstract public function redirect($url, $statusCode, $state = null, $error = null, $errorDescription = null, $errorUri = null);
+    abstract public function redirect($url, $statusCode=302, $state = null, $error = null, $errorDescription = null, $errorUri = null);
 
 
     abstract public function send($format = 'json');

@@ -190,7 +190,7 @@ class Php extends Driver {
      * @return mixed
      * @throws InvalidArgumentException
      */
-    public function redirect($url, $statusCode, $state = null, $error = null, $errorDescription = null, $errorUri = null) {
+    public function redirect($url, $statusCode=302, $state = null, $error = null, $errorDescription = null, $errorUri = null) {
         if (empty($url)) {
             throw new InvalidArgumentException('Cannot redirect to an empty URL.');
         }
@@ -264,6 +264,25 @@ class Php extends Driver {
     private function beautifyCallback($match) {
         return '-' . strtoupper($match[1]);
     }
+
+    /**
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isSuccessful() {
+        return $this->statusCode >= 200 && $this->statusCode < 300;
+    }
+
+    /**
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isRedirection() {
+        return $this->statusCode >= 300 && $this->statusCode < 400;
+    }
+
 
     /**
      * 返回来路

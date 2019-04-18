@@ -33,4 +33,23 @@ abstract class Driver extends Access {
     protected $input;
     */
 
+
+    /**
+     * 获取表单数据，返回一个结果数组
+     * @param string $method
+     * @param null $args
+     * @return array
+     */
+    abstract public function form($method='request',array $args=null);
+
+    /**
+     * 获取表单参数对应的值
+     * 如果获取多个，则以值数组的形式返回
+     *
+     * @param $arg
+     * @param array ...$args
+     * @return array|mixed|null
+     */
+    abstract public function input($arg,...$args);
+
 }
