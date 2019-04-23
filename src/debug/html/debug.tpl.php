@@ -58,11 +58,6 @@
                 <h1 style="color: <?=$color?>"><?php echo date("Y-m-d H:i:s",$val['start'])?></h1>
                 <div><?=$val['url'] ?></div>
                 <div>Spend: <?=$val['spend']?>s &nbsp;&nbsp;Mem: <?=$val['mem']?>&nbsp;&nbsp;Method: <?=$val['method']?> &nbsp;&nbsp;ip: <?=$val['ip']?></div>
-                <?php if(!empty($val['agent'])) {?>
-                    <div>
-                        <?=$val['agent'] ?>
-                    </div>
-                <?php }?>
             </div>
 
             <?php if(!empty($val['log'])) {?>
