@@ -58,6 +58,11 @@
                 <h1 style="color: <?=$color?>"><?php echo date("Y-m-d H:i:s",$val['start'])?></h1>
                 <div><?=$val['url'] ?></div>
                 <div>Spend: <?=$val['spend']?>s &nbsp;&nbsp;Mem: <?=$val['mem']?>&nbsp;&nbsp;Method: <?=$val['method']?> &nbsp;&nbsp;ip: <?=$val['ip']?></div>
+                <?php if(!empty($val['agent'])) {?>
+                    <div>
+                        <?=$val['agent'] ?>
+                    </div>
+                <?php }?>
             </div>
 
             <?php if(!empty($val['log'])) {?>
@@ -169,6 +174,13 @@
                             <tr ><td><?=$k ?></td><td class="breakall"><?=\nb\Debug::optimize($v) ?></td></tr>
                         <?php }?>
                     </table>
+                </div>
+            <?php }?>
+
+            <?php if(!empty($val['agent'])) {?>
+                <h3 onclick="show('agent-<?=$key?>')">Agent</h3>
+                <div id="agent-<?=$key?>">
+                    <table><tr><td><?=$val['agent'] ?></td></tr></table>
                 </div>
             <?php }?>
 
