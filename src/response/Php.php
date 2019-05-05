@@ -192,7 +192,7 @@ class Php extends Driver {
      */
     public function redirect($url, $statusCode=302, $state = null, $error = null, $errorDescription = null, $errorUri = null) {
         if (empty($url)) {
-            throw new InvalidArgumentException('Cannot redirect to an empty URL.');
+            throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
         }
 
         $parameters = [];
@@ -206,19 +206,20 @@ class Php extends Driver {
         }
         $this->code($statusCode);
         $this->addParameters($parameters);
-
+        /*
         if (count($this->parameters) > 0) {
-            // add parameters to URL redirection
             $parts = parse_url($url);
             $sep = isset($parts['query']) && !empty($parts['query']) ? '&' : '?';
             $url .= $sep . http_build_query($this->parameters);
         }
+        */
 
-        $this->addHttpHeaders(['Location' => $url]);
+        $this->httpHeaders['Location']= $url;
 
         if (!$this->isRedirection()) {
-            throw new InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $statusCode));
+            throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $statusCode));
         }
+        return $this;
     }
 
 

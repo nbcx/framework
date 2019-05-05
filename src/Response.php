@@ -27,17 +27,13 @@ class Response extends Component {
         return null;
     }
 
-    public static function header($key, $value=null,$http_response_code=null) {
-        self::driver()->header($key, $value, $http_response_code);
-    }
-
     /**
      * 重定向跳转
      * @param $url
      * @param int $http_response_code
      */
     public static function redirect($url='/', $http_response_code=302) {
-        self::header('Location',$url,$http_response_code);
+        self::driver()->redirect($url,$http_response_code)->send();
         //跳转之后，终止继续运行
         quit();
     }
