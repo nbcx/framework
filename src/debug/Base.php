@@ -119,15 +119,4 @@ class Base extends Command {
         $output->info('----------------------------------------------');
     }
 
-    protected function test() {
-        $output = new Output();
-        $table = new Table($output);
-        $table->setHeaders(['ISBN', '书名', '作者'])
-            ->setRows([
-                ['99921-58-10-7', 'Divine Comedy', 'Dante Alighieri'],
-                new Separator(),
-                [new Cell('This value spans 3 columns.', ['colspan' => 3])]
-            ]);
-        $table->render();
-    }
 }

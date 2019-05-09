@@ -118,7 +118,7 @@ class Config extends Access {
 
     //日志目录路径,需要填写绝对路径
     protected function _path_log() {
-        return __APP__.'tmp'.DS.'log'.DS;
+        return $this->path_temp.'log'.DS;
     }
 
     //自动包含路径
