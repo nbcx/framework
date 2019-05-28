@@ -172,6 +172,13 @@
                 </div>
             <?php }?>
 
+            <?php if(!empty($val['agent'])) {?>
+                <h3 onclick="show('agent-<?=$key?>')">Agent</h3>
+                <div id="agent-<?=$key?>">
+                    <table><tr><td><?=$val['agent'] ?></td></tr></table>
+                </div>
+            <?php }?>
+
             <?php if(!empty($val['cookie'])) {?>
                 <h3 onclick="show('cookie-<?=$key?>')">Cookie</h3>
                 <div id="cookie-<?=$key?>">

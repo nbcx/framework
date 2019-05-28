@@ -1439,11 +1439,11 @@ class Validate extends Access {
             $msg = self::$typeMsg['require'];
         }
         else {
-            $msg = $title . _e('not conform to the rules');
+            $msg = $title . I18n::t('not conform to the rules');
         }
 
         if (is_string($msg) && 0 === strpos($msg, '{%')) {
-            $msg = _e(substr($msg, 2, -1));
+            $msg = I18n::t(substr($msg, 2, -1));
         }
         //elseif ($lang->has($msg)) {
         //    $msg = $lang->get($msg);

@@ -21,41 +21,269 @@ namespace nb\response;
 class Php extends Driver {
 
     /**
-     * 设置http头
-     * @param $key
-     * @param null $value
-     * @param null $http_response_code
+     * @var string
      */
-    public function header($key, $value=null,$http_response_code=null) {
-        if($value) {
-            $key = $key.':'.$value;
+    public $version = '1.1';
+
+    /**
+     * @var int
+     */
+    protected $statusCode = 200;
+
+    /**
+     * @var string
+     */
+    protected $statusText;
+
+    /**
+     * @var string
+     */
+    protected $body = '';
+
+    /**
+     * @var array
+     */
+    protected $httpHeaders = [];
+
+
+    /**
+     * Converts the response object to string containing all headers and the response content.
+     *
+     * @return string The response with headers and content
+     */
+    public function __toString() {
+        $headers = [];
+        foreach ($this->httpHeaders as $name => $value) {
+            $headers[$name] = (array)$value;
         }
-        headers_sent() or header($key,true,$http_response_code);
+
+        return sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText) . "\r\n" .
+            $this->getHttpHeadersAsString($headers) . "\r\n" .
+            $this->getResponseBody();
     }
 
     /**
-     * 设置HTTP状态
+     * Returns the build header line.
      *
-     * @access public
-     * @param integer $code http代码
-     * @return void
+     * @param string $name The header name
+     * @param string $value The header value
+     *
+     * @return string The built header line
      */
-    public function status($code) {
-        if (isset($this->_httpCode[$code])) {
-            header((isset($_SERVER['SERVER_PROTOCOL']) ? $_SERVER['SERVER_PROTOCOL'] : 'HTTP/1.1') . ' ' . $code . ' ' . $this->_httpCode[$code], true, $code);
-        }
+    protected function buildHeader($name, $value) {
+        return sprintf("%s: %s\n", $name, $value);
     }
 
     /**
-     * 在http头部请求中声明类型和字符集
-     *
-     * @access public
-     * @param string $contentType 文档类型
-     * @return void
+     * @param int $statusCode
+     * @param string $text
+     * @throws InvalidArgumentException
      */
-    public function contentType($contentType = 'html',$charset = 'UTF-8') {
-        header('Content-Type: ' . $this->_mimeType[$contentType] . '; charset=' . $charset, true);
+    public function code($statusCode, $text = null) {
+        $this->statusCode = (int)$statusCode;
+        if ($this->isInvalid()) {
+            throw new \InvalidArgumentException(sprintf('The HTTP status code "%s" is not valid.', $statusCode));
+        }
+
+        $this->statusText = false === $text ? '' : (null === $text ? $this->statusTexts[$this->statusCode] : $text);
+        return $this;
     }
+
+    /**
+     * @return Boolean
+     *
+     * @api
+     *
+     * @see http://www.w3.org/Protocols/rfc2616/rfc2616-sec10.html
+     */
+    public function isInvalid() {
+        return $this->statusCode < 100 || $this->statusCode >= 600;
+    }
+
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function header($name, $value) {
+        $this->httpHeaders[$name] = $value;
+    }
+
+    /**
+     * @param string $format
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    public function body($content) {
+        $this->body = $content;
+        return $this;
+    }
+
+    /**
+     * @param string $format
+     */
+    public function send($format = 'html') {
+        // headers have already been sent by the developer
+        if (headers_sent()) {
+            return;
+        }
+        $this->header('Content-Type', $this->mimeType[$format]);
+        if(is_array($this->body)) {
+            switch ($format) {
+                case 'json':
+                    $this->body = json_encode($this->body);
+                    break;
+                case 'xml':
+                    $xml = new \SimpleXMLElement('<response/>');
+                    foreach ($this->body as $key => $param) {
+                        $xml->addChild($key, $param);
+                    }
+                    $this->body = $xml->asXML();
+                    break;
+            }
+        }
+        // status
+        header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
+
+        foreach ($this->httpHeaders as $name => $header) {
+            //ed(sprintf('%s: %s', $name, $header),$this->httpHeaders);
+            header(sprintf('%s: %s', $name, $header));
+        }
+        echo $this->body;
+    }
+
+    /**
+     * @param int $statusCode
+     * @param string $error
+     * @param string $errorDescription
+     * @param string $errorUri
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    public function error($statusCode, $error, $errorDescription = null, $errorUri = null) {
+        $parameters = [
+            'error' => $error,
+            'error_description' => $errorDescription,
+        ];
+
+        if (!is_null($errorUri)) {
+            if (strlen($errorUri) > 0 && $errorUri[0] == '#') {
+                // we are referencing an oauth bookmark (for brevity)
+                $errorUri = 'http://tools.ietf.org/html/rfc6749' . $errorUri;
+            }
+            $parameters['error_uri'] = $errorUri;
+        }
+
+        $this->code($statusCode);
+        $this->body($parameters);
+        $this->header('Cache-Control', 'no-store');
+        return $this;
+    }
+
+    /**
+     * @param int $statusCode
+     * @param string $url
+     * @param string $state
+     * @param string $error
+     * @param string $errorDescription
+     * @param string $errorUri
+     * @return mixed
+     * @throws InvalidArgumentException
+     */
+    public function redirect($url, $statusCode=302, $state = null, $error = null, $errorDescription = null, $errorUri = null) {
+        if (empty($url)) {
+            throw new \InvalidArgumentException('Cannot redirect to an empty URL.');
+        }
+
+        $parameters = [];
+
+        if (!is_null($state)) {
+            $parameters['state'] = $state;
+        }
+
+        if (!is_null($error)) {
+            $this->error(400, $error, $errorDescription, $errorUri);
+        }
+        $this->code($statusCode);
+        $this->addParameters($parameters);
+        /*
+        if (count($this->parameters) > 0) {
+            $parts = parse_url($url);
+            $sep = isset($parts['query']) && !empty($parts['query']) ? '&' : '?';
+            $url .= $sep . http_build_query($this->parameters);
+        }
+        */
+
+        $this->httpHeaders['Location']= $url;
+
+        if (!$this->isRedirection()) {
+            throw new \InvalidArgumentException(sprintf('The HTTP status code is not a redirect ("%s" given).', $statusCode));
+        }
+        return $this;
+    }
+
+
+    /**
+     * Function from Symfony2 HttpFoundation - output pretty header
+     *
+     * @param array $headers
+     * @return string
+     */
+    private function getHttpHeadersAsString($headers) {
+        if (count($headers) == 0) {
+            return '';
+        }
+
+        $max = max(array_map('strlen', array_keys($headers))) + 1;
+        $content = '';
+        ksort($headers);
+        foreach ($headers as $name => $values) {
+            foreach ($values as $value) {
+                $content .= sprintf("%-{$max}s %s\r\n", $this->beautifyHeaderName($name) . ':', $value);
+            }
+        }
+
+        return $content;
+    }
+
+    /**
+     * Function from Symfony2 HttpFoundation - output pretty header
+     *
+     * @param string $name
+     * @return mixed
+     */
+    private function beautifyHeaderName($name) {
+        return preg_replace_callback('/\-(.)/', [$this, 'beautifyCallback'], ucfirst($name));
+    }
+
+    /**
+     * Function from Symfony2 HttpFoundation - output pretty header
+     *
+     * @param array $match
+     * @return string
+     */
+    private function beautifyCallback($match) {
+        return '-' . strtoupper($match[1]);
+    }
+
+    /**
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isSuccessful() {
+        return $this->statusCode >= 200 && $this->statusCode < 300;
+    }
+
+    /**
+     * @return Boolean
+     *
+     * @api
+     */
+    public function isRedirection() {
+        return $this->statusCode >= 300 && $this->statusCode < 400;
+    }
+
 
     /**
      * 返回来路
@@ -99,5 +327,4 @@ class Php extends Driver {
         }
         exit;
     }
-
 }

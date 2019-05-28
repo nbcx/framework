@@ -8,7 +8,7 @@
  * file that was distributed with this source code.
  */
 namespace nb;
-define('__VER__'   ,'2.0.4');//版本号
+define('__VER__'   ,'2.0.5');//版本号
 define('__PHASE__' ,'alpha');//阶段
 /**
  * 框架配置类
@@ -118,7 +118,7 @@ class Config extends Access {
 
     //日志目录路径,需要填写绝对路径
     protected function _path_log() {
-        return __APP__.'tmp'.DS.'log'.DS;
+        return $this->path_temp.'log'.DS;
     }
 
     //自动包含路径

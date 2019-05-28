@@ -157,8 +157,10 @@ class Php extends Driver {
         if(in_array('all',$this->show) || in_array('server',$this->show)){
             $record['server'] = $request->server;
         }
+        else {
+            $record['agent'] = $request->agent;
+        }
         $record['session'] = Session::get();
-
 
         $record['spend'] = round(microtime(true) - $request->requestTimeFloat,4);
         $record['mem'] = number_format((array_sum(explode(' ',memory_get_usage())) - $record['mem'])/1024).'kb';

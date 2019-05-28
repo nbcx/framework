@@ -24,28 +24,31 @@ use nb\Server;
  *
  * @method  \swoole\http\Response end()
  */
-class Http extends Driver {
+class Http extends Php {
 
     /**
      * @var \swoole\http\Response
      */
-    protected $res;
+    protected $response;
 
 
+    /**
+     * @param array $parameters
+     * @param int $statusCode
+     * @param array $headers
+     */
     public function __construct() {
-        $this->res  = Pool::value('\swoole\http\Response');//\nb\driver\Swoole::$o->response;
-
+        $this->response  = Pool::value('\swoole\http\Response');//\nb\driver\Swoole::$o->response;
     }
 
     public function header($key, $value=null,$http_response_code=null) {
         ob_clean();
         if($value === null) {
-            $f = explode(':',$key);
             list($key,$value) = explode(':',$key);
         }
-        $this->res->header($key,$value);
+        $this->response->header($key,$value);
         if($http_response_code) {
-            $this->res->status($http_response_code);
+            $this->response->status($http_response_code);
         }
     }
 
@@ -56,5 +59,32 @@ class Http extends Driver {
         // TODO: Implement __call() method.
         return null;
     }
+
+    /**
+     * @param string $format
+     */
+    public function send($format = 'json') {
+        // headers have already been sent by the developer
+        if (headers_sent()) {
+            return;
+        }
+
+        switch ($format) {
+            case 'json':
+                $this->setHttpHeader('Content-Type', 'application/json');
+                break;
+            case 'xml':
+                $this->setHttpHeader('Content-Type', 'text/xml');
+                break;
+        }
+        // status
+        //header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText));
+        $this->response->status($this->statusCode);
+        foreach ($this->getHttpHeaders() as $name => $header) {
+            $this->response->header($name, $header);
+        }
+        echo $this->getResponseBody($format);
+    }
+
 
 }

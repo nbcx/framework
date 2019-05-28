@@ -82,6 +82,9 @@ class Http extends Php {
             if(in_array('all',$this->show) || in_array('server',$this->show)){
                 $record['server'] = $request->server;
             }
+            else {
+                $record['agent'] = $request->agent;
+            }
             $record['session'] = Session::get();
         }
         else {
